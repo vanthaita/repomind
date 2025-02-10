@@ -1,7 +1,6 @@
-version: '3'
 services:
   db:
-    image: postgres
+    image: pgvector/pgvector:pg17
     restart: always
     environment:
       POSTGRES_USER: postgres

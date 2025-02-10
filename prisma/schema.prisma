@@ -3,11 +3,13 @@
 
 generator client {
     provider = "prisma-client-js"
+    previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
+    extensions = [vector]
 }
 
 model User {
@@ -39,6 +41,10 @@ model Project {
     UserProject UserProject[]
 
     Commit Commit[]
+
+    PullRequest PullRequest[]
+
+    SourceCodeEmbedding SourceCodeEmbedding[]
 }
 
 model UserProject {
@@ -54,6 +60,22 @@ model UserProject {
     @@unique([userId, projectId])
 }
 
+model SourceCodeEmbedding {
+    id        String  @id @default(uuid())
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    summaryEmbedding Unsupported("vector(768)")?
+    sourceCode String
+    fileName String
+    summary  String
+
+    projectId String
+    project Project @relation(fields: [projectId], references: [id])
+
+
+    @@map("source_code_embeddings")
+}
 
 model Commit {
     id        String  @id @default(uuid())
@@ -70,4 +92,27 @@ model Commit {
     commitDate   DateTime
 
     summary String
+}
+
+
+model PullRequest {
+  id           String     @id @default(cuid())
+  projectId    String
+  project      Project    @relation(fields: [projectId], references: [id])
+  prNumber     Int
+  title        String
+  body         String?
+  authorName   String?
+  authorAvatar String?
+  status       String
+  merged       Boolean
+  baseBranch   String
+  headBranch   String
+  diff         String?
+  comments     String?
+  aiAnalysis   String?
+  createdAt    DateTime
+  mergedAt     DateTime?
+  
+  @@unique([projectId, prNumber])
 }

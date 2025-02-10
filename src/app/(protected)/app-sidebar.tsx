@@ -10,7 +10,9 @@ const AppSidebar = () => {
     return (
         <Sidebar collapsible="icon" variant="floating">
             <SidebarHeader>
-                Logo
+                <span className="text-lg font-bold">
+                    Repomind
+                </span>
             </SidebarHeader>
             <SidebarContent>
                 <Button className="w-fit ml-2" variant={'outline'}>

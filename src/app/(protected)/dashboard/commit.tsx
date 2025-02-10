@@ -4,11 +4,17 @@ import { api } from '@/trpc/react';
 import React from 'react';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Code } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import UseProject from '@/hooks/use-project';
-import { compareChangedFiles } from '@/lib/github';
-
+// import { 
+//   Sheet, 
+//   SheetContent, 
+//   SheetHeader, 
+//   SheetTitle, 
+//   SheetTrigger 
+// } from '@/components/ui/sheet';
+// import { ScrollArea } from '@/components/ui/scroll-area';
 const CommitLog = () => {
   const { projectId, project } = UseProject();
   const { data: commits } = api.project.getCommits.useQuery({ projectId });
@@ -16,6 +22,7 @@ const CommitLog = () => {
   if (!commits) {
     return <div>Loading commits...</div>;
   }
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Commit Log</h1>
@@ -36,7 +43,6 @@ const CommitLog = () => {
             </Avatar>
             <div className="flex-1 p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow h-full min-h-[160px]">
               <div className="flex items-start gap-3">
-
                 <div className="flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <div>
@@ -46,21 +52,48 @@ const CommitLog = () => {
                         {/* {format(new Date(commit.commitDate), 'MMM dd, yyyy HH:mm')} */}
                       </p>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex items-center gap-1.5 shrink-0"
-                      asChild
-                    >
-                      <a
-                        href={`${project?.githubUrl}/commit/${commit.commitHash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-1.5 shrink-0"
+                        asChild
                       >
-                        <span>GitHub</span>
-                        <ArrowUpRight className="w-4 h-4" />
-                      </a>
-                    </Button>
+                        <a
+                          href={`${project?.githubUrl}/commit/${commit.commitHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <span>GitHub</span>
+                          <ArrowUpRight className="w-4 h-4" />
+                        </a>
+                      </Button>
+                      {/* <Sheet>
+                        <SheetTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex items-center gap-1.5 shrink-0"
+                          >
+                            <Code className="w-4 h-4" />
+                            <span>View Changes</span>
+                          </Button>
+                        </SheetTrigger>
+                        <SheetContent 
+                          side="right" 
+                          className="w-[800px] z-50 pointer-events-auto"
+                        >
+                          <SheetHeader>
+                            <SheetTitle>Code Changes</SheetTitle>
+                          </SheetHeader>
+                          <ScrollArea className="w-full p-4 h-full">
+                            <pre className="text-sm" tabIndex={0} autoFocus>
+                              HELEDƯKDJWLKDJSLAKDJ;LKDJSLAKDJL
+                            </pre>
+                          </ScrollArea>
+                        </SheetContent>
+                      </Sheet> */}
+                    </div>
                   </div>
                   
                   <div className="mt-4 space-y-2">
@@ -80,7 +113,6 @@ const CommitLog = () => {
             </div>
           </li>
         ))}
-        
       </ul>
     </div>
   );
