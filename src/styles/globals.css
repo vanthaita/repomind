@@ -80,3 +80,40 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+.animate-ticker {
+  animation: ticker 15s linear infinite;
+}
+
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+
+.scroll-custom::-webkit-scrollbar {
+    width: 5px; 
+    height: 5px;
+}
+
+.scroll-custom::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 5px; 
+}
+
+.scroll-custom::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.scroll-custom::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.5); 
+}

@@ -84,7 +84,7 @@ export const aiSummariesCommitTogetherAI = async (diff: string) => {
 // }
 export const generateSummaryDocTogetherAI = async (doc: Document): Promise<string> => {
     try {
-        const code = doc.pageContent.slice(0, 600).split('\n').slice(0, -1).join('\n');
+        const code = doc.pageContent.slice(0, 2000).split('\n').slice(0, -1).join('\n');
         const response = await together.chat.completions.create({
             model: 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
             messages: [

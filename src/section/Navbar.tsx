@@ -3,23 +3,25 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react"; 
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
+import { useAuth } from "@clerk/clerk-react";
 
 const navlinks = [
     { label: "Interactive Demo", href: "/" },
     { label: "Features", href: "#features" },
-    { label: "Pricing", href: "#integrations" },
-    { label: "FAQ", href: "#faqs" },
+    { label: "Pricing", href: "#pricing" },
+    { label: "FAQ", href: "#faq" },
 ];
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+    const {isSignedIn} = useAuth();
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
 
     return (
-        <section className="py-4 lg:py-8 shadow-sm sticky top-0 z-50">
+        <section className="py-4 lg:py-8 shadow-sm sticky top-0 z-50 bg-black">
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-2 lg:grid-cols-3 items-center">
                     <div className="flex justify-start lg:justify-center">
@@ -48,16 +50,32 @@ const Navbar = () => {
                     </div>
 
                     <div className="hidden lg:flex justify-end gap-4">
-                        <Link href="/dashboard">
-                            <Button className="bg-transition border-none hover:bg-neutral-800 hover:text-white transition-colors duration-300" variant={"outline"}>
-                                Sign In
-                            </Button>
-                        </Link>
-                        <Link href="/dashboard">
-                            <Button className="bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
-                                Sign Up
-                            </Button>
-                        </Link>
+                            {
+                                !isSignedIn ?
+                                (
+                                    <>
+                                        <SignInButton mode="modal">
+                                            <Button className="bg-transition border-none hover:bg-neutral-800 hover:text-white transition-colors duration-300" variant={"outline"}>
+                                                Sign In
+                                            </Button>
+                                        </SignInButton>
+                                    
+                                        <SignUpButton mode="modal">
+                                            <Button className="bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
+                                                Sign Up
+                                            </Button>
+                                        </SignUpButton>
+                                    </>
+                                ) : 
+                                (
+                                    <Link href={'/dashboard'}>
+                                        <Button className="bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
+                                            Dashboard
+                                        </Button>
+                                    </Link>
+                                )
+                            }
+                            
                     </div>
                 </div>
 
