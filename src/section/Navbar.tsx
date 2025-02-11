@@ -94,16 +94,31 @@ const Navbar = () => {
                             ))}
                         </nav>
                         <div className="flex flex-col gap-4 mt-4">
-                            <Link href="/dashboard">
-                                <Button className="w-full text-neutral-300 bg-neutral-800 hover:bg-neutral-700 transition-colors duration-300">
-                                    Sign In
-                                </Button>
-                            </Link>
-                            <Link href="/dashboard">
-                                <Button className="w-full bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
-                                    Sign Up
-                                </Button>
-                            </Link>
+                            {
+                                !isSignedIn ?
+                                (
+                                    <>
+                                        <SignInButton mode="modal">
+                                        <Button className="w-full text-neutral-300 bg-neutral-800 hover:bg-neutral-700 transition-colors duration-300">
+                                            Sign In
+                                        </Button>
+                                        </SignInButton>
+                                    
+                                        <SignUpButton mode="modal">
+                                            <Button className="w-full bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
+                                                Sign Up
+                                            </Button>
+                                        </SignUpButton>
+                                    </>
+                                ) : 
+                                (
+                                    <Link href={'/dashboard'}>
+                                        <Button className="w-full bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
+                                            Dashboard
+                                        </Button>
+                                    </Link>
+                                )
+                            }
                         </div>
                     </div>
                 )}

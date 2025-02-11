@@ -4,40 +4,68 @@ import { Tabs } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 import { TabsContent } from '@radix-ui/react-tabs'
 import React, { useState } from 'react'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { lucario } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 type Props = {
     filesReferences: { fileName: string, sourceCode: string, summary: string }[]
 }
 
-const CodeReference = ({ filesReferences = [] }: Props) => { 
+const CodeReference = ({ filesReferences = [] }: Props) => {
     const [tab, setTab] = useState(filesReferences[0]?.fileName);
-
     if (filesReferences.length === 0) return null;
 
     return (
-        <div className='max-w-[800px] w-full'>
-            <Tabs value={tab} onValueChange={setTab}>
-                <div className='overflow-scroll flex gap-2 bg-gray-200 p-1 rounded-md'>
+        <div className='w-full h-full flex flex-col rounded-md overflow-hidden scroll-custom'>
+            <Tabs value={tab} onValueChange={setTab} className="h-full flex flex-col scroll-custom">
+                <div className='flex overflow-x-auto scroll-custom hide-scrollbar'>
                     {filesReferences.map(file => (
                         <button
                             key={file.fileName}
                             className={cn(
-                                'px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap text-muted-foreground hover:bg-muted',
+                                'px-4 py-2 text-sm font-medium border-r border-[#373739]',
+                                'font-mono hover:bg-[#2d2d2d] text-[#cccccc]',
+                                'flex items-center gap-2 flex-shrink-0',
                                 {
-                                    'bg-primary text-primary-foreground': tab === file.fileName
+                                    'text-white bg-[#1e1e1e]': tab === file.fileName,
                                 }
                             )}
                             onClick={() => setTab(file.fileName)}
                         >
-                            {file.fileName}
+                            <span className="truncate">{file.fileName.split('/').pop()}</span>
                         </button>
                     ))}
                 </div>
+
                 {filesReferences.map(file => (
-                    <TabsContent key={file.fileName} value={file.fileName} className='max-h-[40vh] overflow-scroll max-w-full rounded-md mt-2'>
-                        <SyntaxHighlighter language='typescript' style={lucario}>
+                    <TabsContent
+                        key={file.fileName}
+                        value={file.fileName}
+                        className='h-full overflow-auto relative scroll-custom flex-1'
+                    >
+                        <div className="sticky top-0 z-10 bg-[#282828] text-sm font-mono text-[#cccccc] px-4 py-2 border-b border-[#373739]">
+                            {file.fileName}
+                        </div>
+                        <SyntaxHighlighter
+                            language='typescript'
+                            style={vscDarkPlus}
+                            showLineNumbers
+                            wrapLines
+                            customStyle={{
+                                background: '#282828',
+                                margin: 0,
+                                paddingTop: '1rem',
+                                fontSize: '0.975rem',
+                                lineHeight: '1.5',
+                                fontFamily: 'Menlo, Monaco, Consolas, "Courier New", monospace'
+                            }}
+                            lineNumberStyle={{
+                                color: '#424242',
+                                minWidth: '2.5em',
+                                paddingRight: '1rem',
+                                userSelect: 'none'
+                            }}
+                        >
                             {file.sourceCode}
                         </SyntaxHighlighter>
                     </TabsContent>

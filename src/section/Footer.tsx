@@ -12,7 +12,7 @@ export default function Footer() {
         <footer className="bg-neutral-950 py-14">
             <div className="container ">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="mb-6 md:mb-0 flex flex-col justify-center">
+                    <div className="mb-6 md:mb-0 flex flex-col justify-center items-center md:items-start lg:items-start">
                         <h1 className="font-extrabold text-[1.7rem] leading-[3rem] cursor-pointer text-white">
                             Repo<strong className="bg-green-500 text-white px-1 rounded">Mind</strong>
                         </h1>

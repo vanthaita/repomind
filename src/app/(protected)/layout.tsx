@@ -10,8 +10,8 @@ const SidebarLayout = ({children}: Props) => {
   return (
     <SidebarProvider>
         <AppSidebar />
-        <main className='w-full m-2'>
-          <div className='border-sidebar-border bg-sidebar shadow rounded-md overflow-y-scroll h-full p-4'>
+        <main className='w-full'>
+          <div className='overflow-y-scroll h-full scroll-custom bg-[#282828] font-sans antialiased'>
             {children}
             <Toaster />
           </div>

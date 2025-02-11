@@ -25,7 +25,7 @@ export const projectRouter = createTRPCRouter({
             },
         })
         await pollCommits(project.id)
-        // await pollPullRequests(project.id)
+        await pollPullRequests(project.id)
         await GithubRepo(project.id, input.githubUrl, input.githubToken)
         return project
     }),
@@ -34,7 +34,7 @@ export const projectRouter = createTRPCRouter({
             where: {
                 UserProject: {
                     some: {
-                        userId: ctx.user.userId!
+                        userId: ctx.user.userId as string
                     }
                 },
                 delete: null

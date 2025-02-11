@@ -23,17 +23,15 @@ export default function Counter({
     }
   }, [motionValue, isInView]);
 
-  useEffect(
-    () =>
-      springValue.on('change', (latest) => {
-        if (ref.current) {
-          ref.current.textContent = Intl.NumberFormat('en-US').format(
-            latest.toFixed(0)
-          );
-        }
-      }),
-    [springValue]
-  );
-
+  useEffect(() => {
+    springValue.on('change', (latest) => {
+      if (ref.current) {
+        ref.current.textContent = Intl.NumberFormat('en-US', {
+          maximumFractionDigits: 0,
+        }).format(latest);
+      }
+    });
+  }, [springValue]);
+  
   return <span ref={ref} />;
 }
