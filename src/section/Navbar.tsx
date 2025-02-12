@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react"; 
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { useAuth } from "@clerk/clerk-react";
+import CollapsibleBanner from "@/components/Banner";
 
 const navlinks = [
     { label: "Interactive Demo", href: "/" },
@@ -21,7 +22,7 @@ const Navbar = () => {
     };
 
     return (
-        <section className="py-4 lg:py-8 shadow-sm sticky top-0 z-50 bg-black">
+        <section className="py-2 lg:py-4 shadow-sm sticky top-0 z-50 bg-black">
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-2 lg:grid-cols-3 items-center">
                     <div className="flex justify-start lg:justify-center">

@@ -9,16 +9,18 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 type Props = {
     filesReferences: { fileName: string, sourceCode: string, summary: string }[]
+    setShowCodePanel: (open :boolean) => void
 }
 
-const CodeReference = ({ filesReferences = [] }: Props) => {
+const CodeReference = ({ filesReferences = [], setShowCodePanel }: Props) => {
     const [tab, setTab] = useState(filesReferences[0]?.fileName);
     if (filesReferences.length === 0) return null;
 
     return (
         <div className='w-full h-full flex flex-col rounded-md overflow-hidden scroll-custom'>
             <Tabs value={tab} onValueChange={setTab} className="h-full flex flex-col scroll-custom">
-                <div className='flex overflow-x-auto scroll-custom hide-scrollbar'>
+                <div className='flex overflow-x-auto scroll-custom hide-scrollbar border-b border-b-[#424242] justify-between '>
+                    <div className='flex flex-row'>
                     {filesReferences.map(file => (
                         <button
                             key={file.fileName}
@@ -34,7 +36,20 @@ const CodeReference = ({ filesReferences = [] }: Props) => {
                         >
                             <span className="truncate">{file.fileName.split('/').pop()}</span>
                         </button>
+                        
                     ))}
+                    </div>
+                    <button className="text-white mr-1 "onClick={() => setShowCodePanel(false)} >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
 
                 {filesReferences.map(file => (
@@ -54,7 +69,7 @@ const CodeReference = ({ filesReferences = [] }: Props) => {
                             customStyle={{
                                 background: '#282828',
                                 margin: 0,
-                                paddingTop: '1rem',
+                                paddingTop: '0.5rem',
                                 fontSize: '0.975rem',
                                 lineHeight: '1.5',
                                 fontFamily: 'Menlo, Monaco, Consolas, "Courier New", monospace'

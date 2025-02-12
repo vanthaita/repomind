@@ -20,23 +20,28 @@ interface AIAnalysisData {
 interface AiAnalysisProps {
     analysis: string;
 }
-  
+function removeCodeBlockMarkers(text: string): string {
+  return text.replace(/^\s*```json\s*/, '').replace(/\s*```\s*$/, '');
+}
 const AiAnalysis: React.FC<AiAnalysisProps> = ({ analysis }) => {
     try {
       let data: AIAnalysisData;
       try {
+        analysis = removeCodeBlockMarkers(analysis);
         data = JSON.parse(analysis);
+        
+        console.log(analysis);
       } catch (error) {
         console.error("Error parsing analysis JSON:", error);
         return <div>Error parsing analysis data.</div>;
       }
       console.log(typeof data);
       return (
-        <div className="space-y-4 bg-gray-50 p-4 rounded-md border border-gray-200">
+        <div className="space-y-4 bg-[#424242] p-4 rounded-md border border-[#282828]">
           {data.summary && Array.isArray(data.summary) && (
             <div>
-              <h4 className="font-semibold text-lg mb-1">Summary</h4>
-              <ul className="list-disc list-inside pl-4">
+              <h4 className="font-semibold text-lg mb-1 text-green-500">Summary</h4>
+              <ul className="list-disc list-inside pl-4 text-gray-200">
                 {data.summary.map((item: string, idx: number) => (
                   <li key={idx}>{item}</li>
                 ))}
@@ -112,21 +117,20 @@ const PullRequest: React.FC = () => {
   if (!pullRequests) return <div className="p-6">No pull requests found.</div>;
 
   const selectedPr = pullRequests.find(pr => pr.id === selectedPrId);
-
+  console.log(pullRequests[0]?.aiAnalysis)
   return (
-    <div className="p-6">
+    <div className="p-4 bg-[#282828] min-h-screen">
       {selectedPr ? (
-        <div className="space-y-6">
+        <div className="space-y-3">
           <Button
             variant="ghost"
-            className="mb-4 px-0 hover:bg-transparent"
+            className="px-0 hover:bg-transparent text-green-500 hover:text-green-400"
             onClick={() => setSelectedPrId(null)}
           >
             ← Back to Pull Requests
           </Button>
-          
-          <div className="border rounded-lg bg-background">
-            <div className="p-6 border-b">
+          <div className="border border-[#424242] rounded-lg">
+            <div className="p-6 border-b border-[#424242]">
               <h1 className="text-2xl font-semibold flex items-center gap-2">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={selectedPr.authorAvatar ?? ''} alt={selectedPr.authorName ?? ''} />
@@ -152,7 +156,7 @@ const PullRequest: React.FC = () => {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">AI Analysis</h3>
+                  {/* <h3 className="text-lg font-semibold mb-2">AI Analysis</h3> */}
                   <AiAnalysis analysis={selectedPr.aiAnalysis ?? ''} />
                 </div>
               </div>
@@ -187,26 +191,25 @@ const PullRequestSection: React.FC<{
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">{title}</h2>
+      <h2 className="text-xl font-semibold mb-4 text-green-500">{title}</h2>
       <div className="space-y-2">
         {prs.map(pr => (
           <div
             key={pr.id}
             onClick={() => onSelect(pr.id)}
-            className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
+            className="flex items-center justify-between p-4 border border-[#424242] rounded-lg hover:bg-[#282828] hover:border-green-500 cursor-pointer transition-all duration-200 group"
           >
             <div className="flex items-center gap-3">
-              <Avatar className="h-6 w-6">
+              <Avatar className="h-6 w-6 border border-green-500">
                 <AvatarImage src={pr.authorAvatar ?? ''} alt={pr.authorName ?? ''} />
               </Avatar>
-              <span className="font-medium">{pr.title}</span>
+              <span className="font-medium text-gray-200 group-hover:text-green-400">{pr.title}</span>
             </div>
-            <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+            <ArrowUpRight className="h-4 w-4 text-gray-400 group-hover:text-green-500" />
           </div>
         ))}
       </div>
     </div>
   );
 };
-
 export default PullRequest;

@@ -53,10 +53,14 @@ const Pricing = () => {
   const Heading = () => (
     <div className="relative z-10 my-12 flex flex-col items-center justify-center gap-4">
       <div className="flex w-full flex-col items-start justify-center space-y-4 md:items-center">
-        <div className="mb-2 inline-block rounded-full bg-green-100 px-2 py-[0.20rem] text-xs font-medium uppercase text-green-500 dark:bg-green-200">
-          {' '}
-          Pricing
-        </div>
+          <motion.h2
+            className="text-4xl font-bold text-center mb-4 text-green-500"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            PRICING
+          </motion.h2>
         <p className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl dark:text-white">
           Unlock AI-powered insights for GitHub.
         </p>
@@ -145,7 +149,7 @@ const Pricing = () => {
   )
 
   return (
-    <section className="relative w-full overflow-hidden py-12 text-white bg-gray-950 lg:px-2 lg:py-12" id='pricing'>
+    <section className="relative w-full overflow-hidden py-12 text-white bg-gray-950 lg:px-2 lg:py-12 container" id='pricing'>
       <Heading />
       <PricingCards />
     </section>

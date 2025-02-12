@@ -17,8 +17,8 @@ const CommitLog = () => {
   }
 
   return (
-    <div className="mt-4 text-white">
-      <h1 className="text-2xl font-bold mb-6">Summary Commit Log</h1>
+    <div className="mt-4 text-white mb-4">
+      <h1 className="text-xl font-semibold mb-4 text-green-500">Summary Commit Log</h1>
       <ul className="space-y-4">
         {commits.map((commit, index) => (
           <li 
@@ -41,8 +41,7 @@ const CommitLog = () => {
                     <div>
                       <p className="font-semibold">{commit.commitAuthorName}</p>
                       <p className="text-sm text-gray-300 mt-1">
-                        {/* Uncomment and format date */}
-                        {/* {format(new Date(commit.commitDate), 'MMM dd, yyyy HH:mm')} */}
+                        {commit.commitDate.toDateString()}
                       </p>
                     </div>
                     <div className="flex gap-2">

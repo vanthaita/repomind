@@ -14,14 +14,14 @@ const Features = () => {
       id='features'
     >
       <div className="container mx-auto px-4">
-        <motion.h2
-          className="text-4xl font-bold text-center mb-8 text-green-500"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          DISCOVER OUR CAPABILITIES
-        </motion.h2>
+      <motion.h2
+        className="text-4xl font-bold text-center mb-8 text-green-500"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        DISCOVER OUR CAPABILITIES
+      </motion.h2>
         <motion.p
           className="text-xl text-center mb-12"
           initial={{ opacity: 0 }}

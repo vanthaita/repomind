@@ -40,8 +40,6 @@ export const githubLoader = async (
     console.log(`Successfully loaded ${docs.length} documents from GitHub repository: ${githubUrl}`);
     return docs;
 };
-
-
 export const GithubRepo = async (projectId: string, githubUrl: string, githubToken?: string) => {
     try {
         const docs = await githubLoader(githubUrl, githubToken as string);

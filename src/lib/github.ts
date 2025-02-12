@@ -193,7 +193,7 @@ const filterUnprocessedPRs = async (projectId: string, prs: PullRequestResponse[
   return prs.filter(pr => !processedNumbers.has(pr.prNumber));
 };
 function removeCodeBlockMarkers(text: string): string {
-  return text.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+  return text.replace(/^\s*```json\s*/, '').replace(/\s*```\s*$/, '');
 }
 export const pollPullRequests = async (projectId: string) => {
   const { githubUrl } = await fetchProjectGithubUrl(projectId);

@@ -90,23 +90,25 @@ export const generateSummaryDocTogetherAI = async (doc: Document): Promise<strin
             messages: [
                 {
                     role: 'system',
-                    content: 'You are an intelligent senior software engineer who specializes in onboarding junior software engineers onto projects.',
+                    content: 'You are a seasoned software engineer skilled in mentoring junior developers. Your role is to analyze code and provide clear, concise explanations of its purpose and functionality.',
                 },
                 {
                     role: 'user',
-                    content: `You are onboarding a junior software engineer and explaining to them the purpose of the ${doc.metadata.source} file. Here is code: 
-                     ---
-                     ${code}
-                     ---
-                     Give a summary no more than 100 words of code above.`, 
+                    content: `You are onboarding a junior developer and need to explain the purpose and functionality of the ${doc.metadata.source} file. Review the code snippet below and provide a summary that includes:
+                    - The primary purpose of the code.
+                    - Its main functionalities.
+                    - Any notable patterns or practices used.
+                    Keep your explanation simple and clear, and limit the summary to 100 words.
+                    Code snippet:
+                    ---
+                    ${code}
+                    ---`,
                 },
             ],
-            max_tokens: 150, 
+            max_tokens: 150,
             temperature: 0.7,
         });
-
         const summary = response.choices[0]?.message?.content || '';
-        console.log("Summary for", doc.metadata.source, ":", summary.slice(0, 50) + "...");
         return summary;
     } catch (err) {
         console.error("Summary error:", err);

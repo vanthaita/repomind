@@ -4,6 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import { motion } from "framer-motion";
 import React from 'react'
 
 const faqData = [
@@ -49,15 +50,20 @@ const Faq = () => {
     <section className="relative max-w-4xl mx-auto overflow-hidden py-12 text-white bg-transparent lg:px-2 lg:py-12" id="faq">
       <div className="container mx-auto px-4 md:px-6">
         <div className="mb-10 flex flex-col items-center text-center">
-          <div className="mb-2 inline-block rounded-full bg-green-100 px-2 py-[0.20rem] text-xs font-medium uppercase text-green-500 dark:bg-green-200">
-            FAQ
-          </div>
+          <motion.h2
+              className="text-4xl font-bold text-center mb-4 text-green-500"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              FAQ
+          </motion.h2>
           <h2 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Frequently Asked Questions
           </h2>
           <p className="mt-3 text-gray-200 max-w-2xl">
             Have questions? We have answers! Here are some of the most common
-            questions about RepoMind.
+            questions about Repo<strong className="bg-green-500 text-white px-0.5 rounded">Mind</strong>.
           </p>
         </div>
         <Accordion type="single" collapsible className="w-full">

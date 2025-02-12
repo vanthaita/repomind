@@ -47,7 +47,7 @@ const AskQuestion = () => {
   };
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full w-full">
       <div className={`${showCodePanel ? 'w-1/2' : 'w-full'} flex flex-col relative`}>
         <div className="flex-1 overflow-auto scroll-custom p-4 w-full">
           {(answer || loading) ? (
@@ -132,30 +132,17 @@ const AskQuestion = () => {
       </div>
       {showCodePanel ? (
         <div className="w-1/2 max-w-7xl flex flex-col border-l border-l-[#424242]">
-          <div className="flex justify-between items-center p-2 border-b border-b-[#424242]">
-            <h3 className="text-lg font-semibold text-white">Code References</h3>
-            <button onClick={() => setShowCodePanel(false)} className="text-white">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto relative">
             {filesReferences.length > 0 ? (
-              <CodeReference filesReferences={filesReferences} />
+              <CodeReference filesReferences={filesReferences} setShowCodePanel={setShowCodePanel}/>
             ) : (
-              <p className="text-gray-300">No code references available.</p>
+              <p className="text-gray-300 p-2">No code references available.</p>
             )}
           </div>
         </div>
       ) : (
         <div className="w-8 flex items-center justify-center border-l border-l-[#424242]">
+          
           <button onClick={() => setShowCodePanel(true)} className="text-white">
             <svg
               xmlns="http://www.w3.org/2000/svg"
