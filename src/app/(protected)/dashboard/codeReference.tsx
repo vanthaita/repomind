@@ -8,7 +8,12 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 type Props = {
-    filesReferences: { fileName: string, sourceCode: string, summary: string }[]
+    filesReferences: {
+        id?: string;
+        messageId?: string;
+        fileName: string;
+        sourceCode: string; 
+    }[];
     setShowCodePanel: (open :boolean) => void
 }
 
@@ -72,7 +77,9 @@ const CodeReference = ({ filesReferences = [], setShowCodePanel }: Props) => {
                                 paddingTop: '0.5rem',
                                 fontSize: '0.975rem',
                                 lineHeight: '1.5',
-                                fontFamily: 'Menlo, Monaco, Consolas, "Courier New", monospace'
+                                fontFamily: 'Menlo, Monaco, Consolas, "Courier New", monospace',
+                                whiteSpace: 'pre-wrap',
+                                wordBreak: 'break-all',
                             }}
                             lineNumberStyle={{
                                 color: '#424242',

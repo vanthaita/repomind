@@ -5,6 +5,7 @@ import useRefetch from '@/hooks/use-refresh';
 import { api } from '@/trpc/react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
+import EmojiConfetti from '@/components/Emoji';
 
 type FormInput = {
   repoUrl: string;
@@ -21,6 +22,7 @@ const CreatePage = ({ isModalOpen, setIsModalOpen }: CreatePageProps) => {
   const { register, handleSubmit, reset } = useForm<FormInput>();
   const refetch = useRefetch();
   const createProject = api.project.createProject.useMutation();
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const onSubmit = async (data: FormInput) => {
     await createProject.mutateAsync({
@@ -33,6 +35,7 @@ const CreatePage = ({ isModalOpen, setIsModalOpen }: CreatePageProps) => {
         refetch();
         setIsModalOpen(false);
         reset();
+        setShowConfetti(true); 
       },
       onError: () => {
         toast.error('Failed to create project. Please try again.');
@@ -102,6 +105,7 @@ const CreatePage = ({ isModalOpen, setIsModalOpen }: CreatePageProps) => {
           </Button>
         </form>
       </div>
+      {showConfetti && <EmojiConfetti trigger={showConfetti}/>}
     </div>
   );
 };

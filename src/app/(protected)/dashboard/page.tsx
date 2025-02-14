@@ -7,6 +7,7 @@ import { Octokit } from 'octokit';
 import CommitLog from './commit';
 import AskQuestion from './askQuestion';
 import PullRequest from './pullRequest';
+import AskList from './askList';
 
 interface RepoData {
   stargazers_count: number;
@@ -16,7 +17,7 @@ interface RepoData {
 const DashBoardPage: React.FC = () => {
   const { project } = UseProject();
   const [repoData, setRepoData] = useState<RepoData | null>(null);
-  const [activeSection, setActiveSection] = useState<string | null>('commits');
+  const [activeSection, setActiveSection] = useState<string>('ask');
 
   useEffect(() => {
     async function fetchRepoData() {
@@ -56,6 +57,14 @@ const DashBoardPage: React.FC = () => {
     show: { opacity: 1, y: 0, transition: { duration: 0.4 } }
   };
 
+  const handleSectionChange = (section: string) => {
+    if (activeSection === section) {
+      setActiveSection('ask');
+    } else {
+      setActiveSection(section);
+    }
+  };
+
   return (
     <section className="h-screen flex flex-col bg-[#282828] text-white overflow-hidden">
       <header className="w-full h-20 border-b border-[#383838] flex items-center px-4 bg-[#282828]/90 backdrop-blur-sm">
@@ -81,19 +90,19 @@ const DashBoardPage: React.FC = () => {
           </div>
           <button
             className={`p-2 rounded-lg ${activeSection === 'ask' ? 'bg-green-600/30' : 'bg-[#383838]'} hover:bg-green-600/30 transition-colors`}
-            onClick={() => setActiveSection(activeSection === 'ask' ? null : 'ask')}
+            onClick={() => handleSectionChange('ask')}
           >
             <FiMessageSquare className="w-5 h-5" />
           </button>
           <button
             className={`p-2 rounded-lg ${activeSection === 'pr' ? 'bg-[#424242]/30' : 'bg-[#383838]'} hover:bg-[#424242]/30 transition-colors`}
-            onClick={() => setActiveSection(activeSection === 'pr' ? null : 'pr')}
+            onClick={() => handleSectionChange('pr')}
           >
             <FiGitPullRequest className="w-5 h-5" />
           </button>
           <button
             className={`p-2 rounded-lg ${activeSection === 'commits' ? 'bg-blue-600/30' : 'bg-[#383838]'} hover:bg-blue-600/30 transition-colors`}
-            onClick={() => setActiveSection(activeSection === 'commits' ? null : 'commits')}
+            onClick={() => handleSectionChange('commits')}
           >
             <FiGitCommit className="w-5 h-5" />
           </button>
@@ -109,16 +118,14 @@ const DashBoardPage: React.FC = () => {
           <CommitLog />
         </motion.div>
       </div>}
-      {activeSection === 'ask' &&  <div className=" w-full h-full  overflow-y-auto scroll-custom">
-        <motion.div
-          initial="hidden"
-          animate="show"
-          variants={containerVariants}
-          className="w-full h-full"
-        >
-          <AskQuestion />
-        </motion.div>
-      </div>}
+      {activeSection === 'ask' && (
+        <div className="flex-1 w-full h-full overflow-y-auto scroll-custom mb-4">
+          <motion.div initial="hidden" animate="show" variants={containerVariants} className="w-full h-full">
+            <AskList />
+          </motion.div>
+        </div>
+      )}
+
       {activeSection === 'pr' && <div className="flex-1 w-full h-full overflow-y-auto scroll-custom">
         <motion.div
           initial="hidden"

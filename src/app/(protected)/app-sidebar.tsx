@@ -37,9 +37,9 @@ const AppSidebar = () => {
             Your Project
           </SidebarGroupLabel>
           <SidebarContent>
-            <SidebarMenu>
+            <SidebarMenu className="scroll-custom">
               {projects?.map(project => (
-                <SidebarMenuItem key={project.name} className="cursor-pointer">
+                <SidebarMenuItem key={project.name} className="cursor-pointer scroll-custom">
                   <SidebarMenuButton asChild>
                     <div
                       onClick={() => setProjectId(project.id)}

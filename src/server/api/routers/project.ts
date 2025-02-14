@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import z from 'zod'
 import pLimit from 'p-limit';
 import { GithubRepo } from "@/lib/github-loader";
+import { db } from "@/server/db";
 const limit = pLimit(14);
 export const projectRouter = createTRPCRouter({
     createProject: protectedProcedure.input(
@@ -77,5 +78,32 @@ export const projectRouter = createTRPCRouter({
         })
     ).mutation(async ({ ctx, input }) => {
         await GithubRepo(input.projectId, input.githubUrl!, input.githubToken)
+    }),
+    getConversation: protectedProcedure
+        .input(z.object({ conversationId: z.string() }))
+        .query(async ({ ctx, input }) => {
+            return await db.conversation.findUnique({
+                where: { id: input.conversationId },
+                include: {
+                messages: {
+                    include: { fileReference: true },
+                    orderBy: { created_at: "asc" },
+                },
+                },
+            });
+    }),
+    getConversations: protectedProcedure
+        .input(z.object({ projectId: z.string() }))
+        .query(async ({ ctx, input }) => {
+            return await db.conversation.findMany({
+                where: { projectId: input.projectId },
+                select: {
+                    id: true,
+                    title: true,
+                },
+                orderBy: {
+                    createdAt: "desc"
+                }
+            });
     }),
 })

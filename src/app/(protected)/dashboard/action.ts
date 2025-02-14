@@ -9,7 +9,7 @@ const geminiModel = createGoogleGenerativeAI({
     apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY
 })
 
-const recommendationQuestions = async (answer: string, compiledContext: string) => {
+export const recommendationQuestions = async (answer: string, compiledContext: string) => {
     try {
         const { text: generatedQuestions } = await generateText({
             model: geminiModel("gemini-1.5-flash"),
@@ -55,8 +55,54 @@ const recommendationQuestions = async (answer: string, compiledContext: string) 
     } catch (error) {
       console.error("Question generation failed:", error);
     }
-  };
-export const streamAnswerToQuery = async (userQuestion: string, projectIdentifier: string) => {
+};
+
+export const createConversation = async (userQuestion: string, projectIdentifier: string) => {
+    const conversation = await db.conversation.create({
+        data: {
+            projectId: projectIdentifier,
+            title: userQuestion.substring(0, 50)
+        }
+    });
+    return conversation.id;
+}
+export const createMessageUser = async (conversationId: string, userQuestion: string) => {
+    const userMessage = await db.message.create({
+      data: {
+        conversationId,
+        role: 'user',
+        content: userQuestion,
+      },
+    });
+    
+    return {
+      ...userMessage,
+      fileReference: [], 
+    };
+};
+export const createMessageAssistant = async (matchedDocuments: any[], conversationId: string, answer: string) => {
+    const assistantMessage = await db.message.create({
+        data: {
+            conversationId: conversationId,
+            role: 'assistant',
+            content: answer
+        }
+    });
+    await db.messageFileReference.createMany({
+        data: matchedDocuments.map((file) => {
+            return {
+                messageId: assistantMessage.id,
+                fileName: file.fileName,
+                sourceCode: file.sourceCode
+            }
+        })
+    });
+    return {
+        ...assistantMessage,
+        fileReference: matchedDocuments 
+    };
+}
+export const streamAnswerToQuery = async (userQuestion: string, projectIdentifier: string, conversationId: string) => {
     const outputStream = createStreamableValue();
     
     const embeddingVector = await generateEmbedding(userQuestion);
@@ -72,14 +118,13 @@ export const streamAnswerToQuery = async (userQuestion: string, projectIdentifie
         LIMIT 10
     ` as { fileName: string, sourceCode: string, summary: string }[];
     let compiledContext = '';
-    let answer = '';
     for (const entry of matchedDocuments) {
         compiledContext += `source: ${entry.fileName}\ncode content: ${entry.sourceCode}\n summary: ${entry.summary}\n\n`
     }
-    let listQuestion: string[]= [];
+    let answer = '';
     (async () => {
         const { textStream: responseStream } = await streamText({
-            model: geminiModel("gemini-2.0-flash-exp"),
+            model: geminiModel("gemini-1.5-flash"),
             prompt:
             `\n
                 You are an AI code assistant who answers questions about the codebase. Your target audience is a technical intern who is looking to understand the codebase.
@@ -103,16 +148,16 @@ export const streamAnswerToQuery = async (userQuestion: string, projectIdentifie
         });
 
         for await (const chunk of responseStream) {
-            outputStream.update(chunk);
             answer += chunk;
+            outputStream.update(chunk);
         }
         outputStream.done();
     })()
-    listQuestion = await recommendationQuestions(answer, compiledContext) || [];
+    
     return {
         output: outputStream.value,
         fileMatches: matchedDocuments,
-        listAskQuestionRcm: listQuestion
+        compiledContext,
     }
 }
 
