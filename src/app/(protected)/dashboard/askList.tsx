@@ -1,7 +1,7 @@
 import { api } from '@/trpc/react';
 import React from 'react';
 import Link from 'next/link';
-import { MessageCircle, ChevronRight, Plus, Loader2 } from 'lucide-react'; // Added Loader2 for loading state
+import { MessageCircle, ChevronRight, Plus, Loader2 } from 'lucide-react'; 
 import UseProject from '@/hooks/use-project';
 import { Button } from '@/components/ui/button';
 import { createConversation } from './action';

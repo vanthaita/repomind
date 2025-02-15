@@ -4,6 +4,7 @@ import { createStreamableValue } from 'ai/rsc'
 import { createGoogleGenerativeAI, google } from '@ai-sdk/google'
 import { generateEmbedding } from '@/lib/ollama'
 import { db } from '@/server/db'
+import { error } from 'console'
 
 const geminiModel = createGoogleGenerativeAI({
     apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY
@@ -105,6 +106,15 @@ export const createMessageAssistant = async (matchedDocuments: any[], conversati
 export const streamAnswerToQuery = async (userQuestion: string, projectIdentifier: string, conversationId: string) => {
     const outputStream = createStreamableValue();
     
+
+    const isConversationVal = await db.conversation.findUnique({
+        where: { id: conversationId, projectId: projectIdentifier },
+    })
+
+    if(!isConversationVal) {
+        throw error("error conversation id")
+    }
+
     const embeddingVector = await generateEmbedding(userQuestion);
 
     const embeddingQuery = `[${embeddingVector.join(',')}]`
@@ -124,7 +134,7 @@ export const streamAnswerToQuery = async (userQuestion: string, projectIdentifie
     let answer = '';
     (async () => {
         const { textStream: responseStream } = await streamText({
-            model: geminiModel("gemini-1.5-flash"),
+            model: geminiModel("gemini-2.0-pro-exp-02-05"),
             prompt:
             `\n
                 You are an AI code assistant who answers questions about the codebase. Your target audience is a technical intern who is looking to understand the codebase.

@@ -5,11 +5,11 @@ import useProject from '@/hooks/use-project'
 import { usePathname } from 'next/navigation'
 
 const ChatPage = () => {
-    const { project } = useProject()
+    const { project, projectId } = useProject()
     const pathname = usePathname(); 
     const segments = pathname.split('/');
     const id = segments[segments.length - 1];
-
+    
     if (!id) {
         return (
             <section className='h-screen flex flex-col bg-[#282828] text-white overflow-hidden'>

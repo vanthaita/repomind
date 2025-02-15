@@ -133,8 +133,19 @@ const AskQuestion = ({conversationId}: Props) => {
     setQuestion('');
   };
 
-  const selectedMessage = messages.find(msg => msg.id === selectedMessageId);
-
+  const selectedMessageShowFile = (id: string) => {
+    const selectedMessage = messages.find(msg => msg.id === id);
+    if (selectedMessage && selectedMessage.fileReference.length > 0) {
+      const transformedFiles = selectedMessage.fileReference.map(file => ({
+        fileName: file.fileName,
+        sourceCode: file.sourceCode ?? "",
+        summary: '',
+      }));
+      setFilesReferences(transformedFiles);
+      setShowCodePanel(true);
+    }
+  };
+  
   return (
     <div className="flex h-full w-full">
       <div className={`${showCodePanel ? 'w-1/2' : 'w-full'} flex flex-col relative`}>
@@ -201,7 +212,9 @@ const AskQuestion = ({conversationId}: Props) => {
                   )}
                 </div>
                 {message.fileReference.length > 0 && (
-                  <div className="mt-2 text-sm text-gray-400">
+                  <div className="mt-2 text-sm text-gray-400 hover:underline cursor-pointer"
+                    onClick={() => {selectedMessageShowFile(message.id)}}
+                  >
                     Referenced file: {message.fileReference.length}
                   </div>
                 )}

@@ -63,9 +63,7 @@ const Faq = () => {
           </h2>
           <p className="mt-3 text-gray-200 max-w-2xl">
             Have questions? We have answers! Here are some of the most common
-            questions about Repo<strong className="bg-green-500 text-white px-0.5             messageId: assistantMessage.id,
-            fileName: file.fileName,
-            sourceCode: file.sourceCoderounded">Mind</strong>.
+            questions about Repo<strong className="bg-green-500 text-white px-0.5">Mind</strong>.
           </p>
         </div>
         <Accordion type="single" collapsible className="w-full">
