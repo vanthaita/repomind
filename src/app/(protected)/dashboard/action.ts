@@ -134,7 +134,7 @@ export const streamAnswerToQuery = async (userQuestion: string, projectIdentifie
     let answer = '';
     (async () => {
         const { textStream: responseStream } = await streamText({
-            model: geminiModel("gemini-2.0-pro-exp-02-05"),
+            model: geminiModel("gemini-2.0-flash-001"),
             prompt:
             `\n
                 You are an AI code assistant who answers questions about the codebase. Your target audience is a technical intern who is looking to understand the codebase.

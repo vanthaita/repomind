@@ -24,11 +24,19 @@ export const projectRouter = createTRPCRouter({
                     }
                 }
             },
-        })
-        await pollCommits(project.id)
-        await pollPullRequests(project.id)
-        await GithubRepo(project.id, input.githubUrl, input.githubToken)
-        return project
+        });
+    
+        try {
+            await pollCommits(project.id);
+            await pollPullRequests(project.id);
+            await GithubRepo(project.id, input.githubUrl, input.githubToken);
+            return project;
+        } catch (error) {
+            await ctx.db.project.delete({
+                where: { id: project.id }
+            });
+            throw new Error("Failed to initialize project: " + error);
+        }
     }),
     getProjects: protectedProcedure.query(async ({ctx, input}) => {
         return await ctx.db.project.findMany({

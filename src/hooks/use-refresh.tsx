@@ -1,6 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
 
-import React from "react";
 
 
 const useRefetch = () => {

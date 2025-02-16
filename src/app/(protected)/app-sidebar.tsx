@@ -18,6 +18,10 @@ import UseConversation from "@/hooks/use-conversation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Settings, CreditCard, Info } from "lucide-react"; // Import icons
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { createConversation } from "./dashboard/action";
+import useRefetch from "@/hooks/use-refresh";
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const AppSidebar = () => {
   const { projectId, projects, setProjectId } = UseProject();
@@ -27,13 +31,27 @@ const AppSidebar = () => {
   const router = useRouter();
   const segments = pathname.split('/');
   const id = segments[segments.length - 1];
-
+  const [isLoading, setIsLoading] = useState(false); 
+  const refetch = useRefetch();
   const isChatPage = pathname.startsWith("/dashboard/chat");
 
   const handleProjectChange = (newProjectId: string) => {
     setProjectId(newProjectId);
   };
-
+  const onSubmit = async () => {
+    setIsLoading(true);
+    try {
+        const newConversationID = await createConversation('Untitled', projectId);
+        console.log(newConversationID);
+        delay(2000);
+        refetch();
+        router.push(`/dashboard/chat/${newConversationID}`); 
+    } catch (error) {
+        console.error('Failed to create conversation:', error);
+    } finally {
+        setIsLoading(false); 
+    }
+  };
   return (
     <>
       <Sidebar
@@ -77,7 +95,7 @@ const AppSidebar = () => {
           {isChatPage && (
             <>
               <SidebarGroupLabel className="text-gray-300/50 text-sm font-medium uppercase tracking-wider border-t border-t-[#424242] pt-4 mt-4">
-                Conversations
+                Chats
               </SidebarGroupLabel>
               <SidebarContent className="h-[calc(100vh-300px)] overflow-y-auto scroll-custom">
                 <SidebarMenu className="space-y-1">
@@ -101,10 +119,18 @@ const AppSidebar = () => {
                   ))}
                 </SidebarMenu>
               </SidebarContent>
+              <Button className="text-white hover:bg-[#424242] hover:text-white transition-colors duration-200 bg-transparent" variant="outline"
+                onClick={onSubmit}
+                disabled={isLoading} 
+              >
+                <>
+                    <Plus className='w-5 h-5' />
+                    <span className='text-sm font-medium'>New Chat</span>
+                </>
+              </Button>
             </>
           )}
-
-          <SidebarGroupLabel className="text-gray-300/50 text-sm font-medium uppercase tracking-wider border-t border-t-[#424242] pt-4 mt-4">
+          <SidebarGroupLabel className="text-gray-300/50 text-sm font-medium uppercase tracking-wider border-t border-t-[#424242] pt-4">
             Menu
           </SidebarGroupLabel>
           <SidebarMenu className="mb-16 space-y-1">

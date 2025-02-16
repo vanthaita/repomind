@@ -10,6 +10,7 @@ import CodeReference from './codeReference';
 import { Button } from '@/components/ui/button';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/trpc/react';
+import useRefetch from '@/hooks/use-refresh';
 
 export const listAskQuestionDefault = [
   "Can you explain the main functionality of the core modules?",
@@ -36,6 +37,7 @@ const AskQuestion = ({conversationId}: Props) => {
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+  const refetch = useRefetch();
   const [messages, setMessages] = useState<{
     id: string;
     role: string;
@@ -91,7 +93,6 @@ const AskQuestion = ({conversationId}: Props) => {
     try {
       const result = await streamAnswerToQuery(q, project.id, conversationId);
       if (!result) throw new Error('Failed to get a response from the server.');
-      
       const { output, fileMatches, compiledContext } = result;
       setFilesReferences(fileMatches || []);
       
