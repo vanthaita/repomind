@@ -2,7 +2,7 @@
 
 import UseProject from '@/hooks/use-project';
 import React, { useState, useEffect, useRef } from 'react';
-import { createMessageAssistant, createMessageUser, recommendationQuestions, streamAnswerToQuery } from './action';
+import { createAssistantMessage, createUserMessage, generateRecommendationQuestions, streamAndGenerateAnswer } from './action';
 import { readStreamableValue } from 'ai/rsc';
 import MarkDown from '@uiw/react-md-editor';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -78,7 +78,7 @@ const AskQuestion = ({conversationId}: Props) => {
   const handleSubmit = async (q: string) => {
     if (!project?.id) return;
     setLoading(true);
-    const userMessage = await createMessageUser(conversationId, q);
+    const userMessage = await createUserMessage(conversationId, q);
     setMessages((prev) => [...prev, userMessage]);
     
     const tempId = `temp-${Date.now()}`;
@@ -91,7 +91,7 @@ const AskQuestion = ({conversationId}: Props) => {
     setMessages((prev) => [...prev, tempAssistantMessage]);
     
     try {
-      const result = await streamAnswerToQuery(q, project.id, conversationId);
+      const result = await streamAndGenerateAnswer(q, project.id, conversationId);
       if (!result) throw new Error('Failed to get a response from the server.');
       const { output, fileMatches, compiledContext } = result;
       setFilesReferences(fileMatches || []);
@@ -109,7 +109,7 @@ const AskQuestion = ({conversationId}: Props) => {
         }
       }
       
-      const assistantMessage = await createMessageAssistant(fileMatches, conversationId, fullAnswer);
+      const assistantMessage = await createAssistantMessage(fileMatches, conversationId, fullAnswer);
       setMessages((prev) => 
         prev.map(msg => msg.id === tempId ? assistantMessage : msg)
       );
@@ -118,7 +118,7 @@ const AskQuestion = ({conversationId}: Props) => {
       const newData = utils.project.getConversation.getData({ conversationId });
       if (newData) setMessages(newData.messages);
       
-      const listAskQuestionRcm = await recommendationQuestions(fullAnswer, compiledContext) as string[];
+      const listAskQuestionRcm = await generateRecommendationQuestions(fullAnswer, compiledContext) as string[];
       setRecommendedQuestions(listAskQuestionRcm.length > 0 ? listAskQuestionRcm : listAskQuestionDefault);
     } catch (error) {
       console.error('Error:', error);

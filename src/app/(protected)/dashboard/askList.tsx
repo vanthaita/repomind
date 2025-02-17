@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { MessageCircle, ChevronRight, Plus, Loader2 } from 'lucide-react'; 
 import UseProject from '@/hooks/use-project';
 import { Button } from '@/components/ui/button';
-import { createConversation } from './action';
+import { persistConversation } from './action';
 import { useRouter } from 'next/navigation';
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const AskList = () => {
@@ -15,7 +15,7 @@ const AskList = () => {
     const onSubmit = async () => {
         setIsLoading(true);
         try {
-            const newConversationID = await createConversation('Untitled', projectId);
+            const newConversationID = await persistConversation('Untitled', projectId);
             console.log(newConversationID);
             delay(2000);
             router.push(`/dashboard/chat/${newConversationID}`); 

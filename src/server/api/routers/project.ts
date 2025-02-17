@@ -1,8 +1,8 @@
-import { getPullRequests, pollCommits, pollPullRequests } from "@/lib/github";
+import { processCommits, processPullRequests } from "@/lib/github";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import z from 'zod'
 import pLimit from 'p-limit';
-import { GithubRepo } from "@/lib/github-loader";
+import { processGithubRepository } from "@/lib/github-loader";
 import { db } from "@/server/db";
 const limit = pLimit(14);
 export const projectRouter = createTRPCRouter({
@@ -27,9 +27,9 @@ export const projectRouter = createTRPCRouter({
         });
     
         try {
-            await pollCommits(project.id);
-            await pollPullRequests(project.id);
-            await GithubRepo(project.id, input.githubUrl, input.githubToken);
+            await processCommits(project.id);
+            await processPullRequests(project.id);
+            await processGithubRepository(project.id, input.githubUrl, input.githubToken);
             return project;
         } catch (error) {
             await ctx.db.project.delete({
@@ -69,14 +69,14 @@ export const projectRouter = createTRPCRouter({
             projectId: z.string(),
         })
     ).mutation(async ({ ctx, input }) => {
-        await pollCommits(input.projectId);
+        await processCommits(input.projectId);
     }),
     importPullRequests: protectedProcedure.input(
         z.object({
             projectId: z.string(),
         })
     ).mutation(async ({ ctx, input }) => {
-        await pollPullRequests(input.projectId);
+        await processPullRequests(input.projectId);
     }),
     importGithubRepo: protectedProcedure.input(
         z.object({
@@ -85,7 +85,7 @@ export const projectRouter = createTRPCRouter({
             githubToken: z.string(),
         })
     ).mutation(async ({ ctx, input }) => {
-        await GithubRepo(input.projectId, input.githubUrl!, input.githubToken)
+        await processGithubRepository(input.projectId, input.githubUrl!, input.githubToken)
     }),
     getConversation: protectedProcedure
         .input(z.object({ conversationId: z.string() }))

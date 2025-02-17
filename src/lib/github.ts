@@ -1,111 +1,113 @@
 import { db } from '@/server/db';
 import { Octokit } from 'octokit';
-import axios from 'axios'
+import axios from 'axios';
 import { aiSummariesCommit, aiSummariesPullRequest } from './gemini';
-import { aiSummariesCommitLocal } from './ollama';
 import { aiSummariesCommitTogetherAI } from './together';
+
 export const octokit = new Octokit({
   auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN,
 });
 
-type Response = {
-  commitMessage: string;
-  commitHash: string;
-  commitAuthorName: string;
-  commitAuthorAvatar: string;
-  commitDate: string;
+type CommitDetails = {
+  message: string;
+  hash: string;
+  authorName: string;
+  authorAvatar: string;
+  date: string;
 };
-export const getCommitHashes = async (githubUrl: string): Promise<Response[]> => {
-    const [owner, repo] = githubUrl.split('/').slice(-2);
-    if(!owner || !repo) {
-        throw new Error('Invalid GitHub URL');
+
+export const fetchCommitDetails = async (githubUrl: string): Promise<CommitDetails[]> => {
+  const [owner, repo] = githubUrl.split('/').slice(-2);
+  if (!owner || !repo) {
+    throw new Error('Invalid GitHub URL');
+  }
+  const commitListResponse = await octokit.rest.repos.listCommits({
+    owner,
+    repo,
+  });
+  const latestCommits = commitListResponse.data.sort(
+    (commitA: any, commitB: any) =>
+      new Date(commitB.commit.author.date).getTime() - new Date(commitA.commit.author.date).getTime()
+  );
+
+  const commitDetails = latestCommits.slice(0, 15).map((commitItem: any) => ({
+    message: commitItem.commit.message,
+    hash: commitItem.sha,
+    authorName: commitItem.commit.author.name,
+    authorAvatar: commitItem.author ? commitItem.author.avatar_url : '',
+    date: commitItem.commit.author.date,
+  }));
+  return commitDetails;
+};
+
+export const processCommits = async (projectId: string) => {
+  const { githubUrl } = await getProjectGithubUrl(projectId);
+  const latestCommitDetails = await fetchCommitDetails(githubUrl);
+  const newCommitDetails = await filterProcessedCommits(projectId, latestCommitDetails);
+  const aiSummaryResults = await Promise.allSettled(
+    newCommitDetails.map((commitDetails) => {
+      return summarizeCommit(githubUrl, commitDetails.hash);
+    })
+  );
+  const commitSummaries = aiSummaryResults.map((result) => {
+    if (result.status === 'fulfilled') {
+      return result.value;
     }
-    const { data } = await octokit.rest.repos.listCommits({
-        owner,
-        repo,
-    });
-    const sortedCommits = data.sort(
-        (a: any, b: any) =>
-        new Date(b.commit.author.date).getTime() - new Date(a.commit.author.date).getTime()
-    );
-
-    const formattedCommits = sortedCommits.slice(0, 15).map((commit: any) => ({
-        commitMessage: commit.commit.message,
-        commitHash: commit.sha,
-        commitAuthorName: commit.commit.author.name,
-        commitAuthorAvatar: commit.author ? commit.author.avatar_url : '',
-        commitDate: commit.commit.author.date,
-    }));
-    return formattedCommits;
+    return '';
+  });
+  const createdCommits = await db.commit.createMany({
+    data: commitSummaries.map((summaryItem, index) => {
+      const commitDetails = newCommitDetails[index]!;
+      return {
+        projectId,
+        commitHash: commitDetails.hash,
+        commitMessage: commitDetails.message,
+        commitAuthorName: commitDetails.authorName,
+        commitAuthorAvatar: commitDetails.authorAvatar,
+        commitDate: commitDetails.date,
+        summary: summaryItem,
+      };
+    }),
+  });
+  return createdCommits;
 };
 
-export const pollCommits = async (projectId: string) => {
-    const { githubUrl } = await fetchProjectGithubUrl(projectId);
-    const currentCommitHashes = await getCommitHashes(githubUrl);
-    const unprocessedCommits = await filterUnprocessedCommits(projectId, currentCommitHashes);
-    const summaryResponses = await Promise.allSettled(unprocessedCommits.map(commit => {
-        return summariseCommit(githubUrl, commit.commitHash);
-    }))
-    const summaries = summaryResponses.map((response) => {
-        if(response.status === 'fulfilled') {
-            return response.value;
-        }
-        return "" 
-    })
-    const commits = await db.commit.createMany({
-        data: summaries.map((summary, index) => {
-            return {
-                projectId,
-                commitHash: unprocessedCommits[index]!.commitHash,
-                commitMessage: unprocessedCommits[index]!.commitMessage,
-                commitAuthorName: unprocessedCommits[index]!.commitAuthorName,
-                commitAuthorAvatar: unprocessedCommits[index]!.commitAuthorAvatar,
-                commitDate: unprocessedCommits[index]!.commitDate,
-                summary,
-            };
-        })
-    })
-    return commits;
-};
-const summariseCommit = async (githubUrl: string, commitHash: string) => {
-    const {data} = await axios.get(`${githubUrl}/commit/${commitHash}.diff`, {
-        headers: {
-            Accept: 'application/vnd.github.v3.diff',
-        },
-    })
-    // return await aiSummariesCommit(data);
-    // return await aiSummariesCommitLocal(data);
-    return await aiSummariesCommitTogetherAI(data) as string
-
-}
-const fetchProjectGithubUrl = async (projectId: string) => {
-    const project = await db.project.findUnique({
-        where: { id: projectId },
-            select: {
-            githubUrl: true,
-        },
-    });
-
-    if (!project?.githubUrl) {
-      throw new Error('Project not found');
-    }
-
-    return { githubUrl: project.githubUrl };
+const summarizeCommit = async (githubUrl: string, commitHash: string) => {
+  const diffData = await axios.get(`${githubUrl}/commit/${commitHash}.diff`, {
+    headers: {
+      Accept: 'application/vnd.github.v3.diff',
+    },
+  });
+  return (await aiSummariesCommitTogetherAI(diffData.data)) as string;
 };
 
-const filterUnprocessedCommits = async (projectId: string, commitHashes: Response[]) => {
-    const processedCommits = await db.commit.findMany({
-        where: { projectId },
-        select: { commitHash: true },
-    });
+const getProjectGithubUrl = async (projectId: string) => {
+  const projectRecord = await db.project.findUnique({
+    where: { id: projectId },
+    select: {
+      githubUrl: true,
+    },
+  });
 
-    const processedCommitHashes = new Set(processedCommits.map(commit => commit.commitHash));
-    return commitHashes.filter(commit => !processedCommitHashes.has(commit.commitHash));
+  if (!projectRecord?.githubUrl) {
+    throw new Error('Project not found');
+  }
+
+  return { githubUrl: projectRecord.githubUrl };
 };
 
+const filterProcessedCommits = async (projectId: string, commitDetails: CommitDetails[]) => {
+  const existingCommits = await db.commit.findMany({
+    where: { projectId },
+    select: { commitHash: true },
+  });
 
-type PullRequestResponse = {
-  prNumber: number;
+  const existingCommitHashes = new Set(existingCommits.map((commit) => commit.commitHash));
+  return commitDetails.filter((commitDetails) => !existingCommitHashes.has(commitDetails.hash));
+};
+
+type PullRequestDetails = {
+  number: number;
   title: string;
   body: string | null;
   authorName: string | undefined;
@@ -118,14 +120,13 @@ type PullRequestResponse = {
   baseBranch: string;
   headBranch: string;
 };
-  
 
-export const getPullRequests = async (githubUrl: string): Promise<PullRequestResponse[]> => {
+export const fetchPullRequestDetails = async (githubUrl: string): Promise<PullRequestDetails[]> => {
   const [owner, repo] = githubUrl.split('/').slice(-2);
-  if(!owner || !repo) {
+  if (!owner || !repo) {
     throw new Error('Invalid GitHub URL');
   }
-  const { data } = await octokit.rest.pulls.list({
+  const pullRequestListResponse = await octokit.rest.pulls.list({
     owner,
     repo,
     state: 'all',
@@ -133,109 +134,109 @@ export const getPullRequests = async (githubUrl: string): Promise<PullRequestRes
     direction: 'desc',
   });
 
-  return data.slice(0,15).map(pr => ({
-    prNumber: pr.number,
-    title: pr.title,
-    body: pr.body,
-    authorName: pr.user?.login,
-    authorAvatar: pr.user?.avatar_url,
-    status: pr.state,
-    merged: pr.state === 'open' ? false : true,
-    createdAt: pr.created_at,
-    updatedAt: pr.updated_at,
-    mergedAt: pr.merged_at,
-    baseBranch: pr.base.ref,
-    headBranch: pr.head.ref,
+  return pullRequestListResponse.data.slice(0, 15).map((prItem) => ({
+    number: prItem.number,
+    title: prItem.title,
+    body: prItem.body,
+    authorName: prItem.user?.login,
+    authorAvatar: prItem.user?.avatar_url,
+    status: prItem.state,
+    merged: prItem.state === 'open' ? false : true,
+    createdAt: prItem.created_at,
+    updatedAt: prItem.updated_at,
+    mergedAt: prItem.merged_at,
+    baseBranch: prItem.base.ref,
+    headBranch: prItem.head.ref,
   }));
 };
-const summarisePullRequest = async (githubUrl: string, prNumber: number) => {
+
+const summarizePullRequest = async (githubUrl: string, prNumber: number) => {
   const [owner, repo] = githubUrl.split('/').slice(-2);
-  if(!owner || !repo) {
+  if (!owner || !repo) {
     throw new Error('Invalid GitHub URL');
   }
-  const { data: files } = await octokit.rest.pulls.listFiles({
+  const fileListResponse = await octokit.rest.pulls.listFiles({
     owner,
     repo,
     pull_number: prNumber,
   });
-  const { data: comments } = await octokit.rest.pulls.listReviewComments({
+  const commentListResponse = await octokit.rest.pulls.listReviewComments({
     owner,
     repo,
     pull_number: prNumber,
   });
   const apiUrl = `https://api.github.com/repos/${owner}/${repo}/pulls/${prNumber}`;
-  const {data: diff} = await axios.get(apiUrl, {
+  const diffResponse = await axios.get(apiUrl, {
     headers: {
-        Accept: 'application/vnd.github.v3.diff',
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`
+      Accept: 'application/vnd.github.v3.diff',
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
     },
-  })
-  // const aiAnalysis = await aiSummariesPullRequestLocal(diff);
-  const aiAnalysis = await aiSummariesPullRequest(diff);
+  });
+  const pullRequestSummary = await aiSummariesPullRequest(diffResponse.data);
   return {
-    diff,
-    comments: comments.map(c => ({
-      body: c.body,
-      path: c.path,
-      line: c.line,
+    diff: diffResponse.data,
+    comments: commentListResponse.data.map((commentItem) => ({
+      body: commentItem.body,
+      path: commentItem.path,
+      line: commentItem.line,
     })),
-    aiAnalysis,
+    aiAnalysis: pullRequestSummary,
   };
 };
 
-const filterUnprocessedPRs = async (projectId: string, prs: PullRequestResponse[]) => {
-  const processedPRs = await db.pullRequest.findMany({
+const filterProcessedPRs = async (projectId: string, pullRequestDetails: PullRequestDetails[]) => {
+  const existingPullRequests = await db.pullRequest.findMany({
     where: { projectId },
     select: { prNumber: true },
   });
 
-  const processedNumbers = new Set(processedPRs.map(p => p.prNumber));
-  return prs.filter(pr => !processedNumbers.has(pr.prNumber));
+  const existingPrNumbers = new Set(existingPullRequests.map((pr) => pr.prNumber));
+  return pullRequestDetails.filter((prDetails) => !existingPrNumbers.has(prDetails.number));
 };
+
 function removeCodeBlockMarkers(text: string): string {
   return text.replace(/^\s*```json\s*/, '').replace(/\s*```\s*$/, '');
 }
-export const pollPullRequests = async (projectId: string) => {
-  const { githubUrl } = await fetchProjectGithubUrl(projectId);
-  const currentPRs = await getPullRequests(githubUrl);
-  const unprocessedPRs = await filterUnprocessedPRs(projectId, currentPRs);
 
-  const resultResponse = await Promise.allSettled(
-    unprocessedPRs.map(async (pr) => {
-      const details = await summarisePullRequest(githubUrl, pr.prNumber);
-      return { pr, details };
+export const processPullRequests = async (projectId: string) => {
+  const { githubUrl } = await getProjectGithubUrl(projectId);
+  const latestPullRequestDetails = await fetchPullRequestDetails(githubUrl);
+  const newPullRequestDetails = await filterProcessedPRs(projectId, latestPullRequestDetails);
+
+  const prDetailResults = await Promise.allSettled(
+    newPullRequestDetails.map(async (prDetails) => {
+      const details = await summarizePullRequest(githubUrl, prDetails.number);
+      return { pr: prDetails, details };
     })
   );
 
-  const successfulResults = resultResponse
+  const successfulPrDetails = prDetailResults
     .filter(
-      (
-        response
-      ): response is PromiseFulfilledResult<{
-        pr: PullRequestResponse;
-        details: any;
-      }> => response.status === 'fulfilled'
+      (responseItem): responseItem is PromiseFulfilledResult<{ pr: PullRequestDetails; details: any }> =>
+        responseItem.status === 'fulfilled'
     )
-    .map((response) => response.value);
-  console.log(successfulResults)
-  const pullRequests = await db.pullRequest.createMany({
-    data: successfulResults.map(({ pr, details }) => ({
-      projectId,
-      prNumber: pr.prNumber,
-      title: pr.title,
-      body: pr.body,
-      authorName: pr.authorName,
-      authorAvatar: pr.authorAvatar,
-      status: pr.status,
-      merged: pr.status === 'open' ? false : true,
-      baseBranch: pr.baseBranch,
-      headBranch: pr.headBranch,
-      diff: details.diff,
-      comments: JSON.stringify(details.comments),
-      aiAnalysis: removeCodeBlockMarkers(details.aiAnalysis),
-      createdAt: new Date(pr.createdAt),
-      mergedAt: pr.mergedAt ? new Date(pr.mergedAt) : null,
-    })),
+    .map((responseItem) => responseItem.value);
+
+  const createdPullRequests = await db.pullRequest.createMany({
+    data: successfulPrDetails.map((prDetail) => {
+      return {
+        projectId,
+        prNumber: prDetail.pr.number,
+        title: prDetail.pr.title,
+        body: prDetail.pr.body,
+        authorName: prDetail.pr.authorName,
+        authorAvatar: prDetail.pr.authorAvatar,
+        status: prDetail.pr.status,
+        merged: prDetail.pr.merged as boolean,
+        baseBranch: prDetail.pr.baseBranch,
+        headBranch: prDetail.pr.headBranch,
+        diff: prDetail.details.diff,
+        comments: JSON.stringify(prDetail.details.comments),
+        aiAnalysis: removeCodeBlockMarkers(prDetail.details.aiAnalysis),
+        createdAt: new Date(prDetail.pr.createdAt),
+        mergedAt: prDetail.pr.mergedAt ? new Date(prDetail.pr.mergedAt) : null,
+      };
+    }),
   });
-  return pullRequests;
+  return createdPullRequests;
 };

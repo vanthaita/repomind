@@ -1,6 +1,6 @@
 import { SidebarProvider } from '@/components/ui/sidebar'
 import React from 'react'
-import AppSidebar from './app-sidebar'
+import AppSidebar from './appSidebar'
 import { Toaster } from "@/components/ui/toaster"
 type Props = {
     children: React.ReactNode

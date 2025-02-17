@@ -40,7 +40,7 @@ export default function NotFound() {
               href="mailto:thaitv225@gmail.com" 
               className="text-green-400 hover:underline ml-2"
             >
-              support@kaisho.com
+              support@repomind.com
             </a>
           </p>
         </div>

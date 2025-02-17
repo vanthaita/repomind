@@ -52,7 +52,6 @@ const BackToTopButton = () => {
 import Faq from "@/section/Faq";
 import FeatureList from "@/section/Features";
 import Footer from "@/section/Footer";
-import MinimalSocialsFooter from "@/section/Footer";
 import Hero from "@/section/Hero";
 import Navbar from "@/section/Navbar";
 import PricingPage from "@/section/Pricing";

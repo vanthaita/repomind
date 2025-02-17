@@ -5,86 +5,106 @@ import { db } from '@/server/db';
 import { generateSummaryDocLocal } from './ollama';
 import { generateSummaryDocTogetherAI } from './together';
 
-interface GithubLoaderOptions {
+interface GithubLoaderConfig {
     branch?: string;
     ignoreFiles?: string[];
     recursive?: boolean;
-    unknown?: 'warn' | 'error' | 'ignore';
+    unknownHandling?: 'warn' | 'error' | 'ignore';
     maxConcurrency?: number;
     retries?: number;
     retryDelay?: number;
 }
 
-export const githubLoader = async (
-    githubUrl: string,
-    githubToken: string,
-    options: GithubLoaderOptions = {}
+export const loadRepositoryDocuments = async (
+    repoUrl: string,
+    accessToken: string,
+    config: GithubLoaderConfig = {}
 ): Promise<Document[]> => {
     const {
-        branch = 'main',
+        branch: initialBranch = 'main', 
         ignoreFiles = ['package.json', 'package-lock.json', 'pnpm-lock.yaml', 'bun.lockb'],
         recursive = true,
-        unknown = 'warn',
+        unknownHandling = 'warn',
         maxConcurrency = 5,
-    } = options;
+    } = config;
 
-    const loader = new GithubRepoLoader(githubUrl, {
-        accessToken: githubToken || '',
-        branch,
-        ignoreFiles,
-        recursive,
-        unknown,
-        maxConcurrency,
-    });
-    const docs = await loader.load();
-    console.log(`Successfully loaded ${docs.length} documents from GitHub repository: ${githubUrl}`);
-    return docs;
+    const commonBranches = ['main', 'master', 'develop']; 
+
+    let documents: Document[] = [];
+    let lastError: Error | null = null;
+
+    for (const branch of [initialBranch, ...commonBranches]) {
+        try {
+            const repoLoader = new GithubRepoLoader(repoUrl, {
+                accessToken,
+                branch,
+                ignoreFiles,
+                recursive,
+                unknown: unknownHandling,
+                maxConcurrency,
+            });
+
+            documents = await repoLoader.load();
+            console.log(`Loaded ${documents.length} documents from GitHub repository: ${repoUrl} (branch: ${branch})`);
+            return documents;
+        } catch (error) {
+            lastError = error as Error;
+            console.warn(`Failed to load from branch ${branch}, trying next branch...`);
+        }
+    }
+
+    console.error(`Failed to load repository from all common branches: ${commonBranches.join(', ')}`);
+    throw new Error(`Failed to load repository: ${lastError?.message}`);
 };
-export const GithubRepo = async (projectId: string, githubUrl: string, githubToken?: string) => {
+
+export const processGithubRepository = async (projectId: string, repoUrl: string, accessToken?: string) => {
     try {
-        const docs = await githubLoader(githubUrl, githubToken as string);
-        const allEmbeddedDocs = await generateEmbeddingDocs(docs);
+        const documents = await loadRepositoryDocuments(repoUrl, accessToken as string);
+        const embeddingResults = await generateDocumentEmbeddings(documents);
+        
         await Promise.allSettled(
-            allEmbeddedDocs.map(async (embedding, index) => {
-                console.log(`Processing ${index} of ${allEmbeddedDocs.length}`);
-                if(!embedding) return
-                const sourceCodeEmbedding = await db.sourceCodeEmbedding.create({
+            embeddingResults.map(async (embeddingData, documentIndex) => {
+                console.log(`Processing document ${documentIndex + 1} of ${embeddingResults.length}`);
+                if (!embeddingData) return;
+
+                const embeddingRecord = await db.sourceCodeEmbedding.create({
                     data: {
-                    summary: embedding.summaryDoc,
-                    sourceCode: embedding.sourceCode,
-                    fileName: embedding.fileName,
-                    projectId,
+                        summary: embeddingData.summary,
+                        sourceCode: embeddingData.sourceContent,
+                        fileName: embeddingData.filePath,
+                        projectId,
                     },
                 });
                 
                 await db.$executeRaw`
                     UPDATE "source_code_embeddings"
-                    SET "summaryEmbedding" = ${embedding.embeddedDoc}::vector
-                    WHERE "id" = ${sourceCodeEmbedding.id}
+                    SET "summaryEmbedding" = ${embeddingData.embeddingVector}::vector
+                    WHERE "id" = ${embeddingRecord.id}
                 `;
             })
-          );
+        );
           
     } catch (error) {
-        console.error(`Error processing GitHub repository`);
+        console.error('Error processing GitHub repository:', error);
         throw error;
     }
 }
-export const generateEmbeddingDocs = async (docs: Document[]) => {
+
+export const generateDocumentEmbeddings = async (documents: Document[]) => {
     try {
-        return await Promise.all(docs.map(async (doc) => {
-            // const summaryDoc = await generateSummaryDoc(doc);
-            const summaryDoc = await generateSummaryDocTogetherAI(doc);
-            const embeddedDoc = await generateEmbedding(summaryDoc);
+        return await Promise.all(documents.map(async (document) => {
+            const summary = await generateSummaryDocTogetherAI(document);
+            const embeddingVector = await generateEmbedding(summary);
+            
             return {
-                summaryDoc,
-                embeddedDoc,
-                sourceCode: JSON.parse(JSON.stringify(doc.pageContent)),
-                fileName: doc.metadata.source
+                summary,
+                embeddingVector,
+                sourceContent: document.pageContent,
+                filePath: document.metadata.source
             };
         }));
     } catch (error) {
-        console.error(`Error generating embedding documents`);
+        console.error('Error generating document embeddings:', error);
         throw error; 
     }
 }
