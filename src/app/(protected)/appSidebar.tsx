@@ -16,10 +16,10 @@ import CreatePage from "./dashboard/NewProject";
 import { usePathname, useRouter } from "next/navigation";
 import UseConversation from "@/hooks/use-conversation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Settings, CreditCard, Info } from "lucide-react"; // Import icons
+import { Plus, Settings, CreditCard, Info } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { createConversation } from "./dashboard/action";
+import { persistConversation } from "./dashboard/action";
 import useRefetch from "@/hooks/use-refresh";
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -41,7 +41,7 @@ const AppSidebar = () => {
   const onSubmit = async () => {
     setIsLoading(true);
     try {
-        const newConversationID = await createConversation('Untitled', projectId);
+        const newConversationID = await persistConversation('Untitled', projectId);
         console.log(newConversationID);
         delay(2000);
         refetch();
