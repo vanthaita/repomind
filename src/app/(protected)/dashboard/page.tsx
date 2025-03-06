@@ -66,7 +66,7 @@ const DashBoardPage: React.FC = () => {
   };
 
   return (
-    <section className="h-screen flex flex-col bg-[#282828] text-white overflow-hidden">
+    <section className="h-screen flex flex-col bg-[#282828] w-auto text-white overflow-hidden">
       <header className="w-full h-20 border-b border-[#383838] flex items-center px-4 bg-[#282828]/90 backdrop-blur-sm">
         <div className="flex-1">
           <div className='flex items-end gap-2'>
