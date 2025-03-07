@@ -2,15 +2,23 @@
 
 import UseProject from '@/hooks/use-project';
 import React, { useState, useEffect, useRef } from 'react';
-import { createAssistantMessage, createUserMessage, generateRecommendationQuestions, streamAndGenerateAnswer } from './action';
+import { ChangeNameConversation, createAssistantMessage, createUserMessage, generateRecommendationQuestions, streamAndGenerateAnswer } from './action';
 import { readStreamableValue } from 'ai/rsc';
 import MarkDown from '@uiw/react-md-editor';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import CodeReference from './codeReference';
 import { Button } from '@/components/ui/button';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/trpc/react';
-import useRefetch from '@/hooks/use-refresh';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import UseConversation from '@/hooks/use-conversation';
 
 export const listAskQuestionDefault = [
   "Can you explain the main functionality of the core modules?",
@@ -34,10 +42,10 @@ const AskQuestion = ({conversationId}: Props) => {
   const [recommendedQuestions, setRecommendedQuestions] = useState<string[]>(listAskQuestionDefault);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
+  // const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
-  const refetch = useRefetch();
+  // const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+  // const refetch = useRefetch();
   const [messages, setMessages] = useState<{
     id: string;
     role: string;
@@ -89,9 +97,9 @@ const AskQuestion = ({conversationId}: Props) => {
       fileReference: [],
     };
     setMessages((prev) => [...prev, tempAssistantMessage]);
-    
     try {
       const result = await streamAndGenerateAnswer(q, project.id, conversationId);
+
       if (!result) throw new Error('Failed to get a response from the server.');
       const { output, fileMatches, compiledContext } = result;
       setFilesReferences(fileMatches || []);
@@ -117,9 +125,12 @@ const AskQuestion = ({conversationId}: Props) => {
       await utils.project.getConversation.invalidate({ conversationId });
       const newData = utils.project.getConversation.getData({ conversationId });
       if (newData) setMessages(newData.messages);
-      
+       if (conversationData?.title === 'Untitled') {
+        const changeNameConversation = await ChangeNameConversation(q, conversationId);
+      }
       const listAskQuestionRcm = await generateRecommendationQuestions(fullAnswer, compiledContext) as string[];
       setRecommendedQuestions(listAskQuestionRcm.length > 0 ? listAskQuestionRcm : listAskQuestionDefault);
+     
     } catch (error) {
       console.error('Error:', error);
       setMessages((prev) => prev.filter(msg => msg.id !== tempId));
@@ -149,7 +160,7 @@ const AskQuestion = ({conversationId}: Props) => {
   
   return (
     <div className="flex h-full w-full">
-      <div className={`${showCodePanel ? 'w-1/2' : 'w-full'} flex flex-col relative`}>
+      <div className={`w-full flex flex-col relative`}>
         <div className="flex-1 overflow-auto scroll-custom p-4 w-full">
           {messages.map((message) => (
             <div
@@ -214,7 +225,10 @@ const AskQuestion = ({conversationId}: Props) => {
                 </div>
                 {message.fileReference.length > 0 && (
                   <div className="mt-2 text-sm text-gray-400 hover:underline cursor-pointer"
-                    onClick={() => {selectedMessageShowFile(message.id)}}
+                    onClick={() => {
+                      selectedMessageShowFile(message.id);
+                      setShowCodePanel(true); 
+                    }}
                   >
                     Referenced file: {message.fileReference.length}
                   </div>
@@ -279,43 +293,38 @@ const AskQuestion = ({conversationId}: Props) => {
         </div>
       </div>
       {showCodePanel ? (
-        <div className="w-1/2 max-w-7xl flex flex-col border-l border-l-[#424242]">
-          <div className="flex-1 overflow-y-auto relative">
-            {filesReferences.length > 0 ? (
-              <CodeReference filesReferences={filesReferences} setShowCodePanel={setShowCodePanel}/>
-            ) : (
-              <div className='flex w-full justify-between items-center'>
-                <p className="text-gray-300 p-2">No code references available.</p>
-                <button className="text-white mr-1 "onClick={() => setShowCodePanel(false)} >
-                  <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                  >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <button className="text-white">
+              <ChevronLeft className="h-6 w-6" /> 
+            </button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[800px]">
+            <DialogHeader>
+              <DialogTitle>Code References</DialogTitle>
+              <DialogDescription>
+                Here are the code references related to your question.
+              </DialogDescription>
+            </DialogHeader>
+              {filesReferences.length > 0 ? (
+                <CodeReference filesReferences={filesReferences} setShowCodePanel={setShowCodePanel} />
+              ) : (
+                <div className="flex w-full justify-between items-center">
+                  <p className="text-gray-300 p-2">No code references available.</p>
+                  <button className="text-white mr-1" onClick={() => setShowCodePanel(false)}>
+                    <ChevronRight className="h-6 w-6" />
+                  </button>
+                </div>
+              )}
+          </DialogContent>
+        </Dialog>
       ) : (
         <div className="w-8 flex items-center justify-center border-l border-l-[#424242]">
           <button onClick={() => setShowCodePanel(true)} className="text-white">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronRight className="h-6 w-6" /> 
           </button>
         </div>
-      )}   
+      )}
     </div>
   );
 };

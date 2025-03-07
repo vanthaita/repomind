@@ -18,8 +18,8 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${inter.variable}`}>
-        <body className="font-sans antialiased bg-neutral-950 text-white scroll-custom">
+      <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
+        <body className="font-sans antialiased bg-neutral-950 text-white scroll-custom" suppressHydrationWarning>
           <TRPCReactProvider>
             {children}
             <ToastContainer />

@@ -85,7 +85,7 @@ const AppSidebar = () => {
               Your Project
             </SidebarGroupLabel>
           ) : (
-            <SidebarGroupLabel className="text-gray-500/20 text-4xl text-center justify-center font-medium uppercase tracking-wider">
+            <SidebarGroupLabel className="text-gray-300/90 text-4xl text-center justify-center font-medium uppercase tracking-wider">
               <FolderOpenDotIcon className="w-10 h-10"/> 
             </SidebarGroupLabel>
           )}
@@ -238,7 +238,7 @@ const AppSidebar = () => {
                 title="About"  
                 >
                   <Info className="w-4 h-4" />
-                  {!isCollapsed && <span className="ml-2">About</span>}
+                  {!isCollapsed  && <span className="ml-2">About</span>}
                 </div>
               </SidebarMenuButton>
             </SidebarMenuItem>

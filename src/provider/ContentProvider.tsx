@@ -13,7 +13,9 @@ const ContentProvider = ({ children }: Props) => {
 
   return (
     <div className="flex flex-1"> 
+      <div className="hidden md:block">
         <AppSidebar />
+      </div>
       <div className={cn('w-full transition-all duration-300')}>
         {children}
       </div>

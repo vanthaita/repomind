@@ -68,6 +68,21 @@ export const persistConversation = async (userQuestion: string, projectIdentifie
   });
   return conversation.id;
 };
+export const ChangeNameConversation = async (userQuestion: string, conversationId: string) => {
+  if (!conversationId) {
+    throw new Error("Conversation ID is required");
+  }
+  console.log("Updating conversation with ID:", conversationId);
+  console.log(userQuestion, conversationId);
+  const conversation = await db.conversation.update({
+    where: { id: conversationId },
+    data: {
+      title: userQuestion.substring(0, 50),
+    },
+  });
+  console.log('Conversation', conversation);
+  return conversation.id;
+};
 export const createUserMessage = async (conversationId: string, userQuestion: string) => {
   const userMessage = await db.message.create({
     data: {
