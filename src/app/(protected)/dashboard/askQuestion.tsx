@@ -9,16 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import CodeReference from './codeReference';
 import { Button } from '@/components/ui/button';
 import { api } from '@/trpc/react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import UseConversation from '@/hooks/use-conversation';
 
 export const listAskQuestionDefault = [
   "Can you explain the main functionality of the core modules?",
@@ -38,7 +29,7 @@ const AskQuestion = ({conversationId}: Props) => {
   const [filesReferences, setFilesReferences] = useState<
     { fileName: string; sourceCode: string; summary?: string }[]
   >([]);
-  const [showCodePanel, setShowCodePanel] = useState<boolean>(true);
+  const [showCodePanel, setShowCodePanel] = useState<boolean>(false);;
   const [recommendedQuestions, setRecommendedQuestions] = useState<string[]>(listAskQuestionDefault);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -293,31 +284,35 @@ const AskQuestion = ({conversationId}: Props) => {
         </div>
       </div>
       {showCodePanel ? (
-        <Dialog>
-          <DialogTrigger asChild>
-            <button className="text-white">
-              <ChevronLeft className="h-6 w-6" /> 
-            </button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[800px]">
-            <DialogHeader>
-              <DialogTitle>Code References</DialogTitle>
-              <DialogDescription>
-                Here are the code references related to your question.
-              </DialogDescription>
-            </DialogHeader>
-              {filesReferences.length > 0 ? (
-                <CodeReference filesReferences={filesReferences} setShowCodePanel={setShowCodePanel} />
-              ) : (
-                <div className="flex w-full justify-between items-center">
-                  <p className="text-gray-300 p-2">No code references available.</p>
-                  <button className="text-white mr-1" onClick={() => setShowCodePanel(false)}>
-                    <ChevronRight className="h-6 w-6" />
-                  </button>
-                </div>
-              )}
-          </DialogContent>
-        </Dialog>
+        <>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className=" w-3/4 h-3/4 rounded-lg shadow-lg overflow-hidden">
+              <div className="overflow-auto h-full">
+                {filesReferences.length > 0 ? (
+                  <CodeReference filesReferences={filesReferences} setShowCodePanel={setShowCodePanel} />
+                ) : (
+                  <div className='w-full h-full bg-[#1e1e1e] flex justify-center items-center relative'>
+                     <button
+                      className="text-white hover:bg-[#2d2d2d] p-1 rounded absolute top-4 right-4"
+                      onClick={() => setShowCodePanel(false)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                    <div className="text-center text-gray-500">No referenced files found.</div>
+                  </div>
+                )}
+              </div>
+            </div> 
+          </div>
+        </>
       ) : (
         <div className="w-8 flex items-center justify-center border-l border-l-[#424242]">
           <button onClick={() => setShowCodePanel(true)} className="text-white">

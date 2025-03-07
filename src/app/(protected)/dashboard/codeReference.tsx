@@ -26,7 +26,7 @@ const CodeReference = ({ filesReferences = [], setShowCodePanel }: Props) => {
     <div className='w-full h-full flex flex-col rounded-md overflow-hidden'>
       <Tabs value={tab} onValueChange={setTab} className="h-full flex flex-col">
         <div className='flex justify-between items-center border-b border-b-[#424242] p-2 bg-[#1e1e1e]'>
-          <div className='flex overflow-x-auto scroll-custom hide-scrollbar'>
+          <div className='flex overflow-x-auto '>
             {filesReferences.map(file => (
               <button
                 key={file.fileName}
@@ -35,7 +35,7 @@ const CodeReference = ({ filesReferences = [], setShowCodePanel }: Props) => {
                   'font-mono hover:bg-[#2d2d2d] text-[#cccccc]',
                   'flex items-center gap-2 flex-shrink-0',
                   {
-                    'text-white bg-[#1e1e1e]': tab === file.fileName,
+                    'text-white bg-[#413f3f]': tab === file.fileName,
                   }
                 )}
                 onClick={() => setTab(file.fileName)}
@@ -64,9 +64,9 @@ const CodeReference = ({ filesReferences = [], setShowCodePanel }: Props) => {
           <TabsContent
             key={file.fileName}
             value={file.fileName}
-            className='h-full overflow-auto bg-[#282828]'
+            className='h-full overflow-auto bg-[#282828] scroll-custom'
           >
-            <div className="sticky top-0 z-10 bg-[#282828] text-sm font-mono text-[#cccccc] px-4 py-2 border-b border-[#373739]">
+            <div className="sticky top-0 z-10 bg-[#282828] text-sm font-mono text-[#cccccc] px-4 py-2 border-b border-[#373739] ">
               {file.fileName}
             </div>
             <SyntaxHighlighter
