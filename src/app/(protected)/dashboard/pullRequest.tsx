@@ -121,10 +121,10 @@ const PullRequest: React.FC = () => {
   return (
     <div className="p-4 bg-[#282828] min-h-screen">
       {selectedPr ? (
-        <div className="space-y-3">
+        <div className="space-y-3 z-[9999]">
           <Button
             variant="ghost"
-            className="px-0 hover:bg-transparent text-green-500 hover:text-green-400"
+            className="px-0 hover:bg-transparent text-green-500 hover:text-green-400 "
             onClick={() => setSelectedPrId(null)}
           >
             ← Back to Pull Requests

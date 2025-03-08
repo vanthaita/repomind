@@ -14,37 +14,57 @@ export const generateRecommendationQuestions = async (answer: string, compiledCo
   try {
     const { text: generatedQuestions } = await generateText({
       model: geminiModel('gemini-1.5-flash'),
-      prompt: `Analyze the technical documentation and support information below to generate exactly 4 follow-up questions that help developers deeply understand the LLM integration. Follow these strict guidelines:
-            Input Sources:
-            1. The Answer: ${answer}
-            2. Codebase Context: ${compiledContext}
-            Question Requirements:
-            1. Structure (1 question each):
-                a) Configuration/Setup: Specific to environment variables or initialization
-                b) Model Selection: Comparison of mentioned LLM providers/versions
-                c) Advanced Usage: Optimization, monitoring, or advanced RAG patterns
-                d) Provider-Specific: Features unique to one listed provider (Ollama/Gemini)
-            2. Content Rules:
-                - Must reference specific components/functions from the codebase context
-                - Should require understanding of both architecture and LLM concepts
-                - Must be answerable using provided context
-                - Avoid generic questions about AI/ML basics
-            3. Formatting:
-                - Start with "Here are recommended technical follow-up questions:"
-                - Use markdown bullet points (- )
-                - Keep questions under 50 characters
-                - Use code terms (e.g., "vector DB", "temperature param")
-                - No numbered lists
-                - Max 4 questions
-            Example Output:
-            Here are recommended technical follow-up questions:
-            - How do I configure the chunk_size parameter for Ollama embeddings?
-            - What metrics determine choice between Gemini Flash and Pro for RAG?
-            - Can we implement hybrid search with the current vector DB setup?
-            - How does the retry logic handle Gemini's rate limits?
-            
-            **Actual Context Analysis:**
-            Identify 2-3 key technical aspects from the answer and code context that need deeper exploration. Base questions on those aspects.`,
+      prompt: `You are an expert at generating follow-up questions.
+        Input Sources:
+        1. The Answer: ${answer}
+        2. Codebase Context: ${compiledContext}
+        
+        Instructions:
+        1. Analyze the answer and codebase context.
+        2. Generate 4 follow-up questions.
+        3. Follow the question requirements below.
+        
+        Question Requirements:
+        1. Structure (1 question each):
+            a) Configuration/Setup: Specific to environment variables or initialization
+            b) Model Selection: Comparison of mentioned LLM providers/versions
+            c) Advanced Usage: Optimization, monitoring, or advanced RAG patterns
+            d) Provider-Specific: Features unique to one listed provider (Ollama/Gemini)
+        2. Content Rules:
+            - Must reference specific components/functions from the codebase context
+            - Should require understanding of both architecture and LLM concepts
+            - Must be answerable using provided context
+            - Avoid generic questions about AI/ML basics
+        3. Formatting:
+            - Start with "Here are recommended technical follow-up questions:"
+            - Use markdown bullet points (- )
+            - Keep questions under 50 characters
+            - Use code terms (e.g., "vector DB", "temperature param")
+            - No numbered lists
+            - Max 4 questions
+        Example Output:
+        Here are recommended technical follow-up questions:
+        - How do I configure the chunk_size parameter for Ollama embeddings?
+        - What metrics determine choice between Gemini Flash and Pro for RAG?
+        - Can we implement hybrid search with the current vector DB setup?
+        - How does the retry logic handle Gemini's rate limits?
+        
+        **Actual Context Analysis:**
+        Identify 2-3 key technical aspects from the answer and code context that need deeper exploration. Base questions on those aspects.
+        
+        Bad Examples:
+        - What is a vector database? (Too generic)
+        - Can you explain AI? (Too broad)
+        
+        Good Examples:
+        - How does the retry logic handle Gemini's rate limits? (Specific and technical)
+        - What metrics determine choice between Gemini Flash and Pro for RAG? (Specific and technical)
+        
+        Tone:
+        - Technical and specific
+        
+        Style:
+        - Concise and to the point`
     });
 
     const questions = generatedQuestions

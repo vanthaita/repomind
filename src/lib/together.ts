@@ -101,11 +101,10 @@ export const generateSummaryDocTogetherAI = async (doc: Document): Promise<strin
                     Keep your explanation simple and clear, and limit the summary to 100 words.
                     Code snippet:
                     ---
-                    ${code}
+                        ${code}
                     ---`,
                 },
             ],
-            max_tokens: 150,
             temperature: 0.7,
         });
         const summary = response.choices[0]?.message?.content || '';

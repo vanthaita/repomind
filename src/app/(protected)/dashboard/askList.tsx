@@ -1,3 +1,4 @@
+'use client'
 import { api } from '@/trpc/react';
 import React from 'react';
 import Link from 'next/link';
@@ -6,18 +7,21 @@ import UseProject from '@/hooks/use-project';
 import { Button } from '@/components/ui/button';
 import { persistConversation } from './action';
 import { useRouter } from 'next/navigation';
+import useRefetch from '@/hooks/use-refresh';
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const AskList = () => {
     const { projectId } = UseProject();
     const { data: conversations } = api.project.getConversations.useQuery({ projectId });
     const [isLoading, setIsLoading] = React.useState(false); 
     const router = useRouter();
+    const refetch = useRefetch();
     const onSubmit = async () => {
         setIsLoading(true);
         try {
             const newConversationID = await persistConversation('Untitled', projectId);
             console.log(newConversationID);
             delay(2000);
+            refetch();
             router.push(`/dashboard/chat/${newConversationID}`); 
         } catch (error) {
             console.error('Failed to create conversation:', error);
