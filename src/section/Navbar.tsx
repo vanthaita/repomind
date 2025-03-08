@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react"; 
-import { SignInButton, SignUpButton } from "@clerk/nextjs";
-import { useAuth } from "@clerk/clerk-react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import CollapsibleBanner from "@/components/Banner";
 
 const navlinks = [
@@ -16,7 +15,7 @@ const navlinks = [
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const {isSignedIn} = useAuth();
+    const { data: session } = useSession();
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
@@ -52,31 +51,30 @@ const Navbar = () => {
 
                     <div className="hidden lg:flex justify-end gap-4">
                             {
-                                !isSignedIn ?
+                                !session ?
                                 (
                                     <>
-                                        <SignInButton mode="modal">
-                                            <Button className="bg-transition border-none hover:bg-neutral-800 hover:text-white transition-colors duration-300" variant={"outline"}>
-                                                Sign In
-                                            </Button>
-                                        </SignInButton>
-                                    
-                                        <SignUpButton mode="modal">
-                                            <Button className="bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
-                                                Sign Up
-                                            </Button>
-                                        </SignUpButton>
+                                        <Button onClick={() => signIn()} className="bg-transition border-none hover:bg-neutral-800 hover:text-white transition-colors duration-300" variant={"outline"}>
+                                            Sign In
+                                        </Button>
+                                        <Button onClick={() => signIn()} className="bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
+                                            Sign Up
+                                        </Button>
                                     </>
                                 ) : 
                                 (
-                                    <Link href={'/dashboard'}>
-                                        <Button className="bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
-                                            Dashboard
-                                        </Button>
-                                    </Link>
+                                    <>
+                                        <Link href={'/dashboard'}>
+                                            <Button className="bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
+                                                Dashboard
+                                            </Button>
+                                        </Link>
+                                        {/* <Button onClick={() => signOut()} className="bg-red-500 text-white hover:bg-red-600 transition-colors duration-300">
+                                            Sign Out
+                                        </Button> */}
+                                    </>
                                 )
                             }
-                            
                     </div>
                 </div>
 
@@ -96,28 +94,28 @@ const Navbar = () => {
                         </nav>
                         <div className="flex flex-col gap-4 mt-4">
                             {
-                                !isSignedIn ?
+                                !session ?
                                 (
                                     <>
-                                        <SignInButton mode="modal">
-                                        <Button className="w-full text-neutral-300 bg-neutral-800 hover:bg-neutral-700 transition-colors duration-300">
+                                        <Button onClick={() => signIn()} className="w-full text-neutral-300 bg-neutral-800 hover:bg-neutral-700 transition-colors duration-300">
                                             Sign In
                                         </Button>
-                                        </SignInButton>
-                                    
-                                        <SignUpButton mode="modal">
-                                            <Button className="w-full bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
-                                                Sign Up
-                                            </Button>
-                                        </SignUpButton>
+                                        <Button onClick={() => signIn()} className="w-full bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
+                                            Sign Up
+                                        </Button>
                                     </>
                                 ) : 
                                 (
-                                    <Link href={'/dashboard'}>
-                                        <Button className="w-full bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
-                                            Dashboard
-                                        </Button>
-                                    </Link>
+                                    <>
+                                        <Link href={'/dashboard'}>
+                                            <Button className="w-full bg-green-500 text-white hover:bg-green-600 transition-colors duration-300">
+                                                Dashboard
+                                            </Button>
+                                        </Link>
+                                        {/* <Button onClick={() => signOut()} className="w-full bg-red-500 text-white hover:bg-red-600 transition-colors duration-300">
+                                            Sign Out
+                                        </Button> */}
+                                    </>
                                 )
                             }
                         </div>

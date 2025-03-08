@@ -10,6 +10,7 @@ import CodeReference from './codeReference';
 import { Button } from '@/components/ui/button';
 import { api } from '@/trpc/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import useRefetch from '@/hooks/use-refresh';
 
 export const listAskQuestionDefault = [
   "Can you explain the main functionality of the core modules?",
@@ -33,6 +34,7 @@ const AskQuestion = ({conversationId}: Props) => {
   const [recommendedQuestions, setRecommendedQuestions] = useState<string[]>(listAskQuestionDefault);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const refetch = useRefetch();
   // const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   // const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
@@ -118,6 +120,7 @@ const AskQuestion = ({conversationId}: Props) => {
       if (newData) setMessages(newData.messages);
        if (conversationData?.title === 'Untitled') {
         const changeNameConversation = await ChangeNameConversation(q, conversationId);
+        refetch();
       }
       const listAskQuestionRcm = await generateRecommendationQuestions(fullAnswer, compiledContext) as string[];
       setRecommendedQuestions(listAskQuestionRcm.length > 0 ? listAskQuestionRcm : listAskQuestionDefault);
@@ -132,8 +135,13 @@ const AskQuestion = ({conversationId}: Props) => {
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    handleSubmit(question);
-    setQuestion('');
+    handleSubmit(question)
+      .then(() => {
+          setQuestion('');
+      })
+      .catch((error) => {
+          console.error('Submit failed:', error);
+      });
   };
 
   const selectedMessageShowFile = (id: string) => {
@@ -239,6 +247,7 @@ const AskQuestion = ({conversationId}: Props) => {
                     onClick={() => {
                       setQuestion(q);
                       handleSubmit(q);
+                      setQuestion('');
                       setShowRecommendations(false); 
                     }}
                     className="w-full text-left p-2 text-sm text-gray-300 hover:bg-[#424242] rounded"
