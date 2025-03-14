@@ -90,15 +90,15 @@ export const generateSummaryDocTogetherAI = async (doc: Document): Promise<strin
             messages: [
                 {
                     role: 'system',
-                    content: 'You are a seasoned software engineer skilled in mentoring junior developers. Your role is to analyze code and provide clear, concise explanations of its purpose and functionality.',
+                    content: 'You are an expert software engineer known for your ability to quickly understand and explain complex code. Your primary task is to analyze code snippets and create concise, informative summaries for junior developers.  Focus on extracting the core purpose, functionality, and key insights from the code.',
                 },
                 {
                     role: 'user',
-                    content: `You are onboarding a junior developer and need to explain the purpose and functionality of the ${doc.metadata.source} file. Review the code snippet below and provide a summary that includes:
-                    - The primary purpose of the code.
-                    - Its main functionalities.
-                    - Any notable patterns or practices used.
-                    Keep your explanation simple and clear, and limit the summary to 100 words.
+                    content: `As part of onboarding a new junior developer, you need to explain the file: \`${doc.metadata.source}\`. Please analyze the code below and provide a summary that concisely explains:
+                    - Core Objective: What is the main purpose or goal this code is designed to achieve?
+                    - Key Functionalities: What are the essential functions or actions this code performs to meet its objective?
+                    - Notable Aspects:  Are there any significant coding patterns, design choices, algorithms, or best practices demonstrated in this code that a junior developer should be aware of?
+                    Your summary should be easy to understand for someone new to the codebase. Aim for clarity and conciseness, ideally around 100 words. Prioritize conveying the most important information effectively.
                     Code snippet:
                     ---
                         ${code}
