@@ -32,8 +32,15 @@ export const projectRouter = createTRPCRouter({
             await processGithubRepository(project.id, input.githubUrl, input.githubToken);
             return project;
         } catch (error) {
+            await ctx.db.userProject.deleteMany({
+                where: {
+                    projectId: project.id,
+                },
+            });
             await ctx.db.project.delete({
-                where: { id: project.id }
+                where: {
+                    id: project.id,
+                },
             });
             throw new Error("Failed to initialize project: " + error);
         }

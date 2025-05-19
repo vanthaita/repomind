@@ -261,13 +261,25 @@ const AskQuestion = ({conversationId}: Props) => {
         </div>
         <div className="border-t border-t-[#424242] p-4 h-40 bg-[#282828]">
           <form className="flex items-center gap-2" onSubmit={onSubmit}>
-            <textarea
-              placeholder="Type your question here..."
-              className="w-full resize-none border-none outline-none bg-slate-300/25 rounded-lg p-2 sm:bg-transparent sm:p-1"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              onFocus={() => setShowRecommendations(true)} 
-            />
+          <textarea
+            placeholder="Type your question here..."
+            className="w-full resize-none border-none outline-none bg-slate-300/25 rounded-lg p-2 sm:bg-transparent sm:p-1"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            onFocus={() => setShowRecommendations(true)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit(question)
+                  .then(() => {
+                    setQuestion('');
+                  })
+                  .catch((error) => {
+                    console.error('Submit failed:', error);
+                  });
+              }
+            }}
+          />
             <Button
               className="bg-transparent hover:bg-slate-400/25 border-none rounded h-12 p-1 cursor-pointer w-12"
               type="submit"

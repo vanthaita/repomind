@@ -91,8 +91,9 @@ const AppSidebar = () => {
           )}
           <SidebarContent className={cn('h-[calc(100vh-300px)] overflow-y-auto scroll-custom')}>
             <SidebarMenu className="space-y-1">
-              {projects?.map(project => (
-                <SidebarMenuItem key={project.name} className="cursor-pointer">
+            {projects && projects.length > 0 ? (
+              projects.map((project) => (
+                <SidebarMenuItem key={project.id} className="cursor-pointer">
                   <SidebarMenuButton asChild>
                     <div
                       onClick={() => handleProjectChange(project.id)}
@@ -104,7 +105,7 @@ const AppSidebar = () => {
                         },
                         isCollapsed && 'justify-center w-8 h-8 p-0 mx-auto'
                       )}
-                      title={project.name}  
+                      title={project.name}
                     >
                       {isCollapsed ? (
                         <span className="text-white text-xl font-medium uppercase">
@@ -116,7 +117,10 @@ const AppSidebar = () => {
                     </div>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              ))}
+              ))
+            ) : (
+              <div className="p-2 text-gray-400">No project</div>
+            )}
             </SidebarMenu>
           </SidebarContent>
 
