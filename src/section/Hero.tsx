@@ -73,8 +73,7 @@ export default function Hero() {
             Get Started Now
           </motion.a>
         </motion.div>
-
-        <motion.div 
+      <motion.div 
           variants={statsVariants}
           className="mt-16 grid grid-cols-1 md:grid-cols-4 gap-8 text-center text-white"
         >
@@ -98,6 +97,24 @@ export default function Hero() {
             </motion.div>
           ))}
         </motion.div>
+        <motion.div 
+          variants={itemVariants}
+          className="mt-16 max-w-4xl mx-auto"
+        >
+          <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-2xl">
+            <iframe 
+              width="100%"
+              height="450"
+              src="https://www.youtube.com/embed/0UlmJsTIOD8?rel=0&modestbranding=1&controls=1&disablekb=1&fs=0"
+              title="RepoMind Demo"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="rounded-xl"
+            ></iframe>
+          </div>
+        </motion.div>
+
+        
       </div>
     </motion.section>
   );
