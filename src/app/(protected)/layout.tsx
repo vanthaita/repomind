@@ -1,20 +1,16 @@
-import { SidebarProvider } from '@/components/ui/sidebar';
 import React, { Suspense } from 'react';
-import AppSidebar from './appSidebar';
-import ContentProvider from '@/provider/ContentProvider';
+import RippleLoader from '../loading';
 
 type Props = {
   children: React.ReactNode;
 };
 
-const SidebarLayout = ({ children }: Props) => {
+const DashboardLayout = ({ children }: Props) => {
   return (
-    <SidebarProvider>
-          <ContentProvider>
-          {children}
-        </ContentProvider>
-    </SidebarProvider>
+    <Suspense fallback={<RippleLoader />}>
+      {children}
+    </Suspense>
   );
 };
 
-export default SidebarLayout;
+export default DashboardLayout;

@@ -15,7 +15,23 @@ import { cn } from "@/lib/utils";
 import CreatePage from "./dashboard/NewProject";
 import { usePathname, useRouter } from "next/navigation";
 import UseConversation from "@/hooks/use-conversation";
-import { Plus, Settings, CreditCard, Info, ChevronLeft, ChevronRight, FolderOpenDotIcon } from "lucide-react";
+import { 
+  FiGitCommit, 
+  FiGitPullRequest, 
+  FiMessageSquare,
+  FiCode,
+  FiTrendingUp,
+  FiBarChart2,
+  FiUsers,
+  FiSettings,
+  FiStar,
+  FiGitBranch,
+  FiPlus,
+  FiCreditCard,
+  FiInfo,
+  FiChevronLeft,
+  FiChevronRight
+} from "react-icons/fi";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { persistConversation } from "./dashboard/action";
@@ -55,214 +71,205 @@ const AppSidebar = () => {
     }
   };
 
+  const isActive = (path: string) => pathname.includes(path);
+
   return (
-    <div className={cn(" transition-all duration-500", 
-      isCollapsed ? "w-20" : "w-64"
+    <div className={cn("transition-all duration-500 bg-white", 
+      isCollapsed ? "w-20 bg-white z-10" : "w-64"
     )}>
       <Sidebar
         collapsible="icon"
         variant="sidebar"
         className={cn(
-          "px-2 py-2 border-r-[#424242] transition-all duration-300 fixed h-full z-50 bg-[#282828]",
+          "px-2 py-2 border-r border-[#383838] transition-all duration-300 fixed h-full z-50 bg-[#252525]",
           isCollapsed ? "w-20" : "w-64"
         )}
       >
-        <SidebarHeader className="text-white">
-          <Link href="/dashboard/" className={`font-extrabold text-[1.6rem] leading-[3rem] cursor-pointer text-white flex ${isCollapsed ? "justify-center" : "justify-start"}`}>
-            {isCollapsed ? <>
-              <p className="text-center"><strong className="bg-green-500 text-white px-1.5 rounded">R</strong></p>
-              </> : (
-              <>
-                <span>Repo<strong className="bg-green-500 text-white px-0.5 rounded">Mind</strong></span>
-              </>
+        <SidebarHeader className="text-white p-4 border-b border-[#383838]">
+          <Link href="/dashboard/" className={`font-extrabold text-xl cursor-pointer text-white flex ${isCollapsed ? "justify-center" : "justify-start"}`}>
+            {isCollapsed ? (
+              <span className="bg-green-500 text-white px-1.5 rounded">R</span>
+            ) : (
+              <span>Repo<strong className="bg-green-500 text-white px-0.5 rounded">Mind</strong></span>
             )}
           </Link>
         </SidebarHeader>
 
-        <SidebarContent className="overflow-hidden">
-          {!isCollapsed ? (
-            <SidebarGroupLabel className="text-gray-300/50 text-sm font-medium uppercase tracking-wider">
-              Your Project
-            </SidebarGroupLabel>
-          ) : (
-            <SidebarGroupLabel className="text-gray-300/90 text-4xl text-center justify-center font-medium uppercase tracking-wider">
-              <FolderOpenDotIcon className="w-10 h-10"/> 
-            </SidebarGroupLabel>
-          )}
-          <SidebarContent className={cn('h-[calc(100vh-300px)] overflow-y-auto scroll-custom')}>
-            <SidebarMenu className="space-y-1">
-            {projects && projects.length > 0 ? (
-              projects.map((project) => (
-                <SidebarMenuItem key={project.id} className="cursor-pointer">
-                  <SidebarMenuButton asChild>
-                    <div
-                      onClick={() => handleProjectChange(project.id)}
-                      className={cn(
-                        'flex items-center p-2 rounded-md transition-colors duration-200',
-                        {
-                          'bg-green-500 text-black': project.id === projectId,
-                          'hover:bg-[#424242]': project.id !== projectId,
-                        },
-                        isCollapsed && 'justify-center w-8 h-8 p-0 mx-auto'
-                      )}
-                      title={project.name}
-                    >
-                      {isCollapsed ? (
-                        <span className="text-white text-xl font-medium uppercase">
-                          {project.name.charAt(0)}
-                        </span>
-                      ) : (
-                        <span className="text-white">{project.name}</span>
-                      )}
-                    </div>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))
-            ) : (
-              <div className="p-2 text-gray-400">No project</div>
+        <SidebarContent className="overflow-hidden flex flex-col h-full">
+          <div className="mb-4 p-2">
+            {!isCollapsed && (
+              <SidebarGroupLabel className="text-[#666] text-xs uppercase font-semibold mb-2">
+                Repository
+              </SidebarGroupLabel>
             )}
+            <SidebarMenu className="space-y-1">
+              <NavItem 
+                icon={<FiMessageSquare />} 
+                href={`/project/${projectId}`} 
+                active={isActive(`/project/${projectId}`)}
+                collapsed={isCollapsed}
+                title="Discussion"
+              />
+              <NavItem 
+                icon={<FiGitCommit />} 
+                href={`/project/${projectId}/commits`} 
+                active={isActive(`/project/${projectId}/commits`)}
+                collapsed={isCollapsed}
+                title="Commits"
+              />
+              <NavItem 
+                icon={<FiGitPullRequest />} 
+                href={`/project/${projectId}/pull-requests`} 
+                active={isActive(`/project/${projectId}/pull-requests`)}
+                collapsed={isCollapsed}
+                title="Pull Requests"
+              />
+              <NavItem 
+                icon={<FiCode />} 
+                href={`/project/${projectId}/code`} 
+                active={isActive(`/project/${projectId}/code`)}
+                collapsed={isCollapsed}
+                title="Code Analysis"
+              />
             </SidebarMenu>
-          </SidebarContent>
+          </div>
+
+          {/* Insights Section */}
+          <div className="mb-4 p-2">
+            {!isCollapsed && (
+              <SidebarGroupLabel className="text-[#666] text-xs uppercase font-semibold mb-2">
+                Insights
+              </SidebarGroupLabel>
+            )}
+            <SidebarMenu className="space-y-1">
+              <NavItem 
+                icon={<FiTrendingUp />} 
+                href={`/project/${projectId}/metrics`} 
+                active={isActive(`/project/${projectId}/metrics`)}
+                collapsed={isCollapsed}
+                title="Code Metrics"
+              />
+              <NavItem 
+                icon={<FiBarChart2 />} 
+                href={`/project/${projectId}/patterns`} 
+                active={isActive(`/project/${projectId}/patterns`)}
+                collapsed={isCollapsed}
+                title="Commit Patterns"
+              />
+              <NavItem 
+                icon={<FiGitBranch />} 
+                href={`/project/${projectId}/branches`} 
+                active={isActive(`/project/${projectId}/branches`)}
+                collapsed={isCollapsed}
+                title="Branch Management"
+              />
+              <NavItem 
+                icon={<FiUsers />} 
+                href={`/project/${projectId}/collaboration`} 
+                active={isActive(`/project/${projectId}/collaboration`)}
+                collapsed={isCollapsed}
+                title="Team Collaboration"
+              />
+            </SidebarMenu>
+          </div>
 
           {isChatPage && (
-            <>
-              <SidebarGroupLabel className="text-gray-300/50 text-sm font-medium uppercase tracking-wider border-t border-t-[#424242] pt-4 mt-4 w-full">
-                Chats
-              </SidebarGroupLabel>
-              <SidebarContent className={cn("h-[calc(100vh-300px)] overflow-y-auto scroll-custom")}>
-                <SidebarMenu className="space-y-1">
-                  {conversations?.map(conversation => (
-                    <SidebarMenuItem key={conversation.id} className="cursor-pointer">
-                      <SidebarMenuButton asChild>
-                        <div
-                          onClick={() => router.push(`/dashboard/chat/${conversation.id}`)}
-                          className={cn(
-                            'flex items-center p-2 rounded-md transition-colors duration-200',
-                            {
-                              'bg-green-500 text-black': conversation.id === id,
-                              'hover:bg-[#424242]': conversation.id !== id,
-                            },
-                            isCollapsed && 'justify-center w-8 h-8 p-0 mx-auto'
-                          )}
-                          title={conversation.title || "Untitled Conversation"}  
-                        >
-                          {isCollapsed ? (
-                            <span className="text-white text-sm font-medium uppercase">
-                              {(conversation.title || "Untitled").charAt(0)}
-                            </span>
-                          ) : (
-                            <span className="text-white">{conversation.title || "Untitled Conversation"}</span>
-                          )}
-                        </div>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarContent>
+            <div className="mb-4 p-2 border-t border-[#383838] pt-4">
+              {!isCollapsed && (
+                <SidebarGroupLabel className="text-[#666] text-xs uppercase font-semibold mb-2">
+                  Chats
+                </SidebarGroupLabel>
+              )}
+              <SidebarMenu className="space-y-1">
+                {conversations?.map(conversation => (
+                  <SidebarMenuItem key={conversation.id} className="cursor-pointer">
+                    <SidebarMenuButton asChild>
+                      <div
+                        onClick={() => router.push(`/dashboard/chat/${conversation.id}`)}
+                        className={cn(
+                          'flex items-center p-2 rounded-md transition-colors duration-200',
+                          {
+                            'bg-[#383838] text-white': conversation.id === id,
+                            'hover:bg-[#333] text-[#aaa]': conversation.id !== id,
+                          },
+                          isCollapsed && 'justify-center'
+                        )}
+                        title={conversation.title || "Untitled Conversation"}  
+                      >
+                        {isCollapsed ? (
+                          <span className="text-white font-medium uppercase">
+                            {(conversation.title || "U").charAt(0)}
+                          </span>
+                        ) : (
+                          <span className="text-white truncate">{conversation.title || "Untitled Conversation"}</span>
+                        )}
+                      </div>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
               
               <Button
                 className={cn(
-                  "text-white hover:bg-[#424242] hover:text-white transition-colors duration-200 bg-transparent",
-                  isCollapsed ? "w-10 h-10 p-0 mx-auto" : "w-full"
+                  "mt-2 text-white hover:bg-[#383838] transition-colors duration-200 bg-transparent w-full",
+                  isCollapsed ? "p-2" : "p-2 justify-start"
                 )}
-                variant="outline"
+                variant="ghost"
                 onClick={onSubmit}
                 disabled={isLoading}
                 title="New Chat"  
               >
-                {isCollapsed ? (
-                  <Plus className="w-5 h-5" />
-                ) : (
-                  <>
-                    <Plus className="w-5 h-5 mr-2" />
-                    <span className="text-sm font-medium">New Chat</span>
-                  </>
-                )}
+                <FiPlus className="w-4 h-4" />
+                {!isCollapsed && <span className="ml-2">New Chat</span>}
               </Button>
-            </>
+            </div>
           )}
 
-          {!isCollapsed && (
-            <SidebarGroupLabel className="text-gray-300/50 text-sm font-medium uppercase tracking-wider border-t border-t-[#424242] pt-4">
-              Menu
-            </SidebarGroupLabel>
-          )}
-          
-          <SidebarMenu className="mb-16 space-y-1">
-            <SidebarMenuItem className="cursor-pointer">
-              <SidebarMenuButton asChild>
-                <div
-                  onClick={() => setIsModalOpen(true)}
-                  className={cn(
-                    'flex items-center p-2 rounded-md text-white hover:bg-[#424242] transition-colors duration-200',
-                    isCollapsed ? 'justify-center' : 'justify-start'
-                  )}
-                  title="New Project"  
-                >
-                  <Plus className="w-4 h-4" />
-                  {!isCollapsed && <span className="ml-2">New Project</span>}
-                </div>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-
-            <SidebarMenuItem className="cursor-pointer">
-              <SidebarMenuButton asChild>
-                <div className={cn(
-                  'flex items-center p-2 rounded-md text-white hover:bg-[#424242] transition-colors duration-200',
-                  isCollapsed ? 'justify-center' : 'justify-start'
-                )}
-                title="Settings"  
-                >
-                  <Settings className="w-4 h-4" />
-                  {!isCollapsed && <span className="ml-2">Settings</span>}
-                </div>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-
-            <SidebarMenuItem className="cursor-pointer">
-              <SidebarMenuButton asChild>
-                <div className={cn(
-                  'flex items-center p-2 rounded-md text-white hover:bg-[#424242] transition-colors duration-200',
-                  isCollapsed ? 'justify-center' : 'justify-start'
-                )}
-                title="Billing"  
-                >
-                  <CreditCard className="w-4 h-4" />
-                  {!isCollapsed && <span className="ml-2">Billing</span>}
-                </div>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-
-            <SidebarMenuItem className="cursor-pointer">
-              <SidebarMenuButton asChild>
-                <div className={cn(
-                  'flex items-center p-2 rounded-md text-white hover:bg-[#424242] transition-colors duration-200',
-                  isCollapsed ? 'justify-center' : 'justify-start'
-                )}
-                title="About"  
-                >
-                  <Info className="w-4 h-4" />
-                  {!isCollapsed  && <span className="ml-2">About</span>}
-                </div>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+          <div className="mt-auto p-2 border-t border-[#383838]">
+            <SidebarMenu className="space-y-1">
+              <NavItem 
+                icon={<FiPlus />} 
+                onClick={() => setIsModalOpen(true)}
+                collapsed={isCollapsed}
+                title="New Project"
+              />
+              <NavItem 
+                icon={<FiSettings />} 
+                href={`/project/${projectId}/settings`} 
+                active={isActive(`/project/${projectId}/settings`)}
+                collapsed={isCollapsed}
+                title="Settings"
+              />
+              <NavItem 
+                icon={<FiCreditCard />} 
+                href="/billing" 
+                active={isActive("/billing")}
+                collapsed={isCollapsed}
+                title="Billing"
+              />
+              <NavItem 
+                icon={<FiInfo />} 
+                href="/about" 
+                active={isActive("/about")}
+                collapsed={isCollapsed}
+                title="About"
+              />
+            </SidebarMenu>
+          </div>
 
           {!isCollapsed && (
-            <SidebarGroupLabel className="rounded-none w-full">
-              <h6 className="cursor-pointer text-gray-300/50 text-sm">
-                @2025 Repo<strong className="bg-green-500 text-white px-1 rounded">Mind</strong>
-              </h6>
-            </SidebarGroupLabel>
+            <div className="p-2 text-center text-xs text-[#666]">
+              @2025 Repo<strong className="bg-green-500 text-white px-0.5 rounded">Mind</strong>
+            </div>
           )}
         </SidebarContent>
 
         <Button
           onClick={toggleSidebar}
-          className="absolute top-5 right-0 transform translate-x-1/2 bg-[#282828] p-2 rounded-full border border-[#424242] hover:bg-[#424242] transition-colors duration-200"
+          className="absolute top-5 right-0 transform translate-x-1/2 bg-[#252525] p-1 rounded-full border border-[#383838] hover:bg-[#383838] transition-colors duration-200"
           title={isCollapsed ? "Expand" : "Collapse"}  
         >
-          {isCollapsed ? <ChevronRight className="w-4 h-4 text-white" /> : <ChevronLeft className="w-4 h-4 text-white" />}
+          {isCollapsed ? <FiChevronRight className="w-4 h-4" /> : <FiChevronLeft className="w-4 h-4" />}
         </Button>
       </Sidebar>
 
@@ -274,5 +281,55 @@ const AppSidebar = () => {
     </div>
   );
 }
+
+const NavItem = ({ 
+  icon, 
+  href, 
+  active, 
+  collapsed, 
+  title,
+  onClick 
+}: { 
+  icon: React.ReactNode, 
+  href?: string,
+  active?: boolean,
+  collapsed: boolean,
+  title: string,
+  onClick?: () => void
+}) => {
+  const content = (
+    <div
+      className={cn(
+        'flex items-center p-2 rounded-md transition-colors duration-200',
+        {
+          'bg-[#383838] text-white': active,
+          'hover:bg-[#333] text-[#aaa]': !active,
+        },
+        collapsed ? 'justify-center' : 'justify-start'
+      )}
+      title={title}
+      onClick={onClick}
+    >
+      {icon}
+      {!collapsed && <span className="ml-2">{title}</span>}
+    </div>
+  );
+
+  return href ? (
+    <Link href={href} passHref>
+      <SidebarMenuItem className="cursor-pointer">
+        <SidebarMenuButton asChild>
+          {content}
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </Link>
+  ) : (
+    <SidebarMenuItem className="cursor-pointer">
+      <SidebarMenuButton asChild>
+        {content}
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+};
 
 export default AppSidebar;
