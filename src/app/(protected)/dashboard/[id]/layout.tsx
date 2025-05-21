@@ -3,6 +3,7 @@ import React, { Suspense } from 'react';
 import ContentProvider from '@/provider/ContentProvider';
 import RippleLoader from '@/app/loading';
 import DashboardProjectHeader from './DashboardHeader';
+import DashboardProvider from '@/provider/DashboardProvider';
 
 type Props = {
   children: React.ReactNode;
@@ -10,15 +11,17 @@ type Props = {
 
 const DashboardLayout = ({ children }: Props) => {
   return (
-    <SidebarProvider>
-      <ContentProvider>
-      <Suspense fallback={<RippleLoader />}>
-        <DashboardProjectHeader>
-          {children}
-        </DashboardProjectHeader>
-      </Suspense>
-    </ContentProvider>
-    </SidebarProvider>
+    <main suppressHydrationWarning>
+      <SidebarProvider>
+        <ContentProvider>
+          <Suspense fallback={<RippleLoader />}>
+              <DashboardProvider>
+                {children}
+              </DashboardProvider>
+          </Suspense>
+        </ContentProvider>
+      </SidebarProvider>
+    </main>
   );
 };
 

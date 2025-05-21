@@ -14,10 +14,9 @@ interface RepoData {
   language: string;
 }
 
-const DashboardProjectHeader: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const DashboardProjectHeader = () => {
   const { project } = UseProject();
   const [repoData, setRepoData] = useState<RepoData | null>(null);
-  const pathname = usePathname();
 
   useEffect(() => {
     async function fetchRepoData() {
@@ -44,9 +43,7 @@ const DashboardProjectHeader: React.FC<{ children: React.ReactNode }> = ({ child
   }, [project?.githubUrl]);
 
   return (
-    <div className="flex h-screen bg-[#1e1e1e] text-white overflow-hidden">
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-[4.3rem] border-b border-[#383838] flex items-center justify-between px-6 bg-[#252525]/90 backdrop-blur-sm">
+        <header className="h-[4.3rem] border-b border-[#383838] flex items-center justify-between px-6 bg-[#252525]/90 backdrop-blur-sm ">
           <div>
             <h2 className="text-lg font-semibold">
               {project?.name}
@@ -73,11 +70,6 @@ const DashboardProjectHeader: React.FC<{ children: React.ReactNode }> = ({ child
             </div>
           )}
         </header>
-        <div className="flex-1 overflow-y-auto p-6">
-          {children}
-        </div>
-      </main>
-    </div>
   );
 };
 

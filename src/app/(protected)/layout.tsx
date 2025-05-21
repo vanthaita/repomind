@@ -7,9 +7,12 @@ type Props = {
 
 const DashboardLayout = ({ children }: Props) => {
   return (
+    <main className='bg-[#282828]' suppressHydrationWarning>
     <Suspense fallback={<RippleLoader />}>
       {children}
-    </Suspense>
+    </Suspense>  
+    </main>
+    
   );
 };
 

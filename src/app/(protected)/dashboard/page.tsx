@@ -94,7 +94,6 @@ const DashboardPage = () => {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Your Projects</h1>
-      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {projects?.map((project) => {
           const data = getRepoData(project.githubUrl as string);
@@ -160,7 +159,6 @@ const DashboardPage = () => {
           );
         })}
         
-        {/* New Project Card */}
         <div 
           onClick={() => router.push('/dashboard/new-project')}
           className="border-2 border-dashed border-[#383838] rounded-lg p-4 hover:border-green-500 transition-colors cursor-pointer bg-[#282828] hover:bg-[#333] flex flex-col items-center justify-center min-h-[200px]"

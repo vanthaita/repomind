@@ -13,8 +13,7 @@ import {
 import UseProject from "@/hooks/use-project";
 import { cn } from "@/lib/utils";
 import CreatePage from "./dashboard/NewProject";
-import { usePathname, useRouter } from "next/navigation";
-import UseConversation from "@/hooks/use-conversation";
+import { usePathname } from "next/navigation";
 import { 
   FiGitCommit, 
   FiGitPullRequest, 
@@ -24,7 +23,6 @@ import {
   FiBarChart2,
   FiUsers,
   FiSettings,
-  FiStar,
   FiGitBranch,
   FiPlus,
   FiCreditCard,
@@ -34,44 +32,21 @@ import {
 } from "react-icons/fi";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { persistConversation } from "./dashboard/action";
-import useRefetch from "@/hooks/use-refresh";
 import useCollapsed from "@/hooks/use-collapsed";
-
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+import { MessageCircleCode } from "lucide-react";
 
 const AppSidebar = () => {
-  const { projectId, projects, setProjectId } = UseProject();
+  const { projectId } = UseProject();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { conversations } = UseConversation();
   const pathname = usePathname();
-  const router = useRouter();
-  const segments = pathname.split('/');
-  const id = segments[segments.length - 1];
-  const [isLoading, setIsLoading] = useState(false);
-  const refetch = useRefetch();
-  const isChatPage = pathname.startsWith("/dashboard/chat");
   const { isCollapsed, toggleSidebar } = useCollapsed();
 
-  const handleProjectChange = (newProjectId: string) => {
-    setProjectId(newProjectId);
-  };
-
-  const onSubmit = async () => {
-    setIsLoading(true);
-    try {
-      const newConversationID = await persistConversation('Untitled', projectId);
-      delay(2000);
-      refetch();
-      router.push(`/dashboard/chat/${newConversationID}`);
-    } catch (error) {
-      console.error('Failed to create conversation:', error);
-    } finally {
-      setIsLoading(false);
+  const isActive = (path: string, exact: boolean = false) => {
+    if (exact) {
+      return pathname === path;
     }
+    return pathname.includes(path);
   };
-
-  const isActive = (path: string) => pathname.includes(path);
 
   return (
     <div className={cn("transition-all duration-500 bg-white", 
@@ -81,7 +56,7 @@ const AppSidebar = () => {
         collapsible="icon"
         variant="sidebar"
         className={cn(
-          "px-2 py-2 border-r border-[#383838] transition-all duration-300 fixed h-full z-50 bg-[#252525]",
+          "px-2 py-2 border-r border-[#383838] overflow-hidden transition-all duration-300 fixed h-full z-50 bg-[#252525]",
           isCollapsed ? "w-20" : "w-64"
         )}
       >
@@ -95,160 +70,119 @@ const AppSidebar = () => {
           </Link>
         </SidebarHeader>
 
-        <SidebarContent className="overflow-hidden flex flex-col h-full">
-          <div className="mb-4 p-2">
-            {!isCollapsed && (
-              <SidebarGroupLabel className="text-[#666] text-xs uppercase font-semibold mb-2">
-                Repository
-              </SidebarGroupLabel>
-            )}
-            <SidebarMenu className="space-y-1">
-              <NavItem 
-                icon={<FiMessageSquare />} 
-                href={`/project/${projectId}`} 
-                active={isActive(`/project/${projectId}`)}
-                collapsed={isCollapsed}
-                title="Discussion"
-              />
-              <NavItem 
-                icon={<FiGitCommit />} 
-                href={`/project/${projectId}/commits`} 
-                active={isActive(`/project/${projectId}/commits`)}
-                collapsed={isCollapsed}
-                title="Commits"
-              />
-              <NavItem 
-                icon={<FiGitPullRequest />} 
-                href={`/project/${projectId}/pull-requests`} 
-                active={isActive(`/project/${projectId}/pull-requests`)}
-                collapsed={isCollapsed}
-                title="Pull Requests"
-              />
-              <NavItem 
-                icon={<FiCode />} 
-                href={`/project/${projectId}/code`} 
-                active={isActive(`/project/${projectId}/code`)}
-                collapsed={isCollapsed}
-                title="Code Analysis"
-              />
-            </SidebarMenu>
-          </div>
-
-          {/* Insights Section */}
-          <div className="mb-4 p-2">
-            {!isCollapsed && (
-              <SidebarGroupLabel className="text-[#666] text-xs uppercase font-semibold mb-2">
-                Insights
-              </SidebarGroupLabel>
-            )}
-            <SidebarMenu className="space-y-1">
-              <NavItem 
-                icon={<FiTrendingUp />} 
-                href={`/project/${projectId}/metrics`} 
-                active={isActive(`/project/${projectId}/metrics`)}
-                collapsed={isCollapsed}
-                title="Code Metrics"
-              />
-              <NavItem 
-                icon={<FiBarChart2 />} 
-                href={`/project/${projectId}/patterns`} 
-                active={isActive(`/project/${projectId}/patterns`)}
-                collapsed={isCollapsed}
-                title="Commit Patterns"
-              />
-              <NavItem 
-                icon={<FiGitBranch />} 
-                href={`/project/${projectId}/branches`} 
-                active={isActive(`/project/${projectId}/branches`)}
-                collapsed={isCollapsed}
-                title="Branch Management"
-              />
-              <NavItem 
-                icon={<FiUsers />} 
-                href={`/project/${projectId}/collaboration`} 
-                active={isActive(`/project/${projectId}/collaboration`)}
-                collapsed={isCollapsed}
-                title="Team Collaboration"
-              />
-            </SidebarMenu>
-          </div>
-
-          {isChatPage && (
-            <div className="mb-4 p-2 border-t border-[#383838] pt-4">
+        <SidebarContent className="flex flex-col h-[calc(100%-60px)]">
+          <div className="flex-1 overflow-y-auto">
+            {/* Repository Section */}
+            <div className="mb-2 p-1">
               {!isCollapsed && (
-                <SidebarGroupLabel className="text-[#666] text-xs uppercase font-semibold mb-2">
-                  Chats
+                <SidebarGroupLabel className="text-[#666] text-[11px] uppercase font-semibold mb-1 px-2">
+                  Repository
                 </SidebarGroupLabel>
               )}
-              <SidebarMenu className="space-y-1">
-                {conversations?.map(conversation => (
-                  <SidebarMenuItem key={conversation.id} className="cursor-pointer">
-                    <SidebarMenuButton asChild>
-                      <div
-                        onClick={() => router.push(`/dashboard/chat/${conversation.id}`)}
-                        className={cn(
-                          'flex items-center p-2 rounded-md transition-colors duration-200',
-                          {
-                            'bg-[#383838] text-white': conversation.id === id,
-                            'hover:bg-[#333] text-[#aaa]': conversation.id !== id,
-                          },
-                          isCollapsed && 'justify-center'
-                        )}
-                        title={conversation.title || "Untitled Conversation"}  
-                      >
-                        {isCollapsed ? (
-                          <span className="text-white font-medium uppercase">
-                            {(conversation.title || "U").charAt(0)}
-                          </span>
-                        ) : (
-                          <span className="text-white truncate">{conversation.title || "Untitled Conversation"}</span>
-                        )}
-                      </div>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+              <SidebarMenu className="space-y-0.5">
+                <NavItem 
+                  icon={<FiMessageSquare size={18} />} 
+                  href={`/dashboard/${projectId}`} 
+                  active={isActive(`/dashboard/${projectId}`, true)}
+                  collapsed={isCollapsed}
+                  title="Discussion"
+                />
+                <NavItem 
+                  icon={<MessageCircleCode size={18} />} 
+                  href={`/dashboard/${projectId}/chats`} 
+                  active={isActive(`/dashboard/${projectId}/chats`)}
+                  collapsed={isCollapsed}
+                  title="Chats"
+                />
+                <NavItem 
+                  icon={<FiGitCommit size={18} />} 
+                  href={`/dashboard/${projectId}/commits`} 
+                  active={isActive(`/dashboard/${projectId}/commits`)}
+                  collapsed={isCollapsed}
+                  title="Commits"
+                />
+                <NavItem 
+                  icon={<FiGitPullRequest size={18} />} 
+                  href={`/dashboard/${projectId}/pull-requests`} 
+                  active={isActive(`/dashboard/${projectId}/pull-requests`)}
+                  collapsed={isCollapsed}
+                  title="PRs"
+                />
+                <NavItem 
+                  icon={<FiCode size={18} />} 
+                  href={`/dashboard/${projectId}/code`} 
+                  active={isActive(`/dashboard/${projectId}/code`)}
+                  collapsed={isCollapsed}
+                  title="Code"
+                />
               </SidebarMenu>
-              
-              <Button
-                className={cn(
-                  "mt-2 text-white hover:bg-[#383838] transition-colors duration-200 bg-transparent w-full",
-                  isCollapsed ? "p-2" : "p-2 justify-start"
-                )}
-                variant="ghost"
-                onClick={onSubmit}
-                disabled={isLoading}
-                title="New Chat"  
-              >
-                <FiPlus className="w-4 h-4" />
-                {!isCollapsed && <span className="ml-2">New Chat</span>}
-              </Button>
             </div>
-          )}
 
-          <div className="mt-auto p-2 border-t border-[#383838]">
-            <SidebarMenu className="space-y-1">
+            {/* Insights Section */}
+            <div className="mb-2 p-1">
+              {!isCollapsed && (
+                <SidebarGroupLabel className="text-[#666] text-[11px] uppercase font-semibold mb-1 px-2">
+                  Insights
+                </SidebarGroupLabel>
+              )}
+              <SidebarMenu className="space-y-0.5">
+                <NavItem 
+                  icon={<FiTrendingUp size={18} />} 
+                  href={`/dashboard/${projectId}/metrics`} 
+                  active={isActive(`/dashboard/${projectId}/metrics`)}
+                  collapsed={isCollapsed}
+                  title="Metrics"
+                />
+                <NavItem 
+                  icon={<FiBarChart2 size={18} />} 
+                  href={`/dashboard/${projectId}/patterns`} 
+                  active={isActive(`/dashboard/${projectId}/patterns`)}
+                  collapsed={isCollapsed}
+                  title="Patterns"
+                />
+                <NavItem 
+                  icon={<FiGitBranch size={18} />} 
+                  href={`/dashboard/${projectId}/branches`} 
+                  active={isActive(`/dashboard/${projectId}/branches`)}
+                  collapsed={isCollapsed}
+                  title="Branches"
+                />
+                <NavItem 
+                  icon={<FiUsers size={18} />} 
+                  href={`/dashboard/${projectId}/collaboration`} 
+                  active={isActive(`/dashboard/${projectId}/collaboration`)}
+                  collapsed={isCollapsed}
+                  title="Team"
+                />
+              </SidebarMenu>
+            </div>
+          </div>
+
+          {/* Bottom Section */}
+          <div className="p-1 border-t border-[#383838]">
+            <SidebarMenu className="space-y-0.5">
               <NavItem 
-                icon={<FiPlus />} 
+                icon={<FiPlus size={18} />} 
                 onClick={() => setIsModalOpen(true)}
                 collapsed={isCollapsed}
                 title="New Project"
               />
               <NavItem 
-                icon={<FiSettings />} 
-                href={`/project/${projectId}/settings`} 
-                active={isActive(`/project/${projectId}/settings`)}
+                icon={<FiSettings size={18} />} 
+                href={`/dashboard/${projectId}/settings`} 
+                active={isActive(`/dashboard/${projectId}/settings`)}
                 collapsed={isCollapsed}
                 title="Settings"
               />
               <NavItem 
-                icon={<FiCreditCard />} 
+                icon={<FiCreditCard size={18} />} 
                 href="/billing" 
                 active={isActive("/billing")}
                 collapsed={isCollapsed}
                 title="Billing"
               />
               <NavItem 
-                icon={<FiInfo />} 
+                icon={<FiInfo size={18} />} 
                 href="/about" 
                 active={isActive("/about")}
                 collapsed={isCollapsed}
@@ -266,7 +200,7 @@ const AppSidebar = () => {
 
         <Button
           onClick={toggleSidebar}
-          className="absolute top-5 right-0 transform translate-x-1/2 bg-[#252525] p-1 rounded-full border border-[#383838] hover:bg-[#383838] transition-colors duration-200"
+          className="absolute top-5 right-0 transform translate-x-1/2 bg-[#252525] p-1 rounded-full border border-[#383838] hover:bg-[#383838] transition-colors duration-200 z-50"
           title={isCollapsed ? "Expand" : "Collapse"}  
         >
           {isCollapsed ? <FiChevronRight className="w-4 h-4" /> : <FiChevronLeft className="w-4 h-4" />}
@@ -310,8 +244,8 @@ const NavItem = ({
       title={title}
       onClick={onClick}
     >
-      {icon}
-      {!collapsed && <span className="ml-2">{title}</span>}
+      <span className="flex-shrink-0">{icon}</span>
+      {!collapsed && <span className="ml-2 text-sm truncate">{title}</span>}
     </div>
   );
 
