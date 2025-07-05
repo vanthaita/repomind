@@ -10,6 +10,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import UseProject from "@/hooks/use-project";
 import { cn } from "@/lib/utils";
 import CreatePage from "./dashboard/NewProject";
@@ -28,18 +30,37 @@ import {
   FiCreditCard,
   FiInfo,
   FiChevronLeft,
-  FiChevronRight
+  FiChevronRight,
+  FiFolder,
+  FiStar,
+  FiEye,
+  FiClock,
+  FiActivity,
+  FiZap,
+  FiBookOpen,
+  FiShield,
+  FiPlay,
+  FiAlertCircle
 } from "react-icons/fi";
+import { FaRobot, FaBrain } from "react-icons/fa";
+import { SiOpenai } from "react-icons/si";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import useCollapsed from "@/hooks/use-collapsed";
 import { MessageCircleCode } from "lucide-react";
+import { api } from "@/trpc/react";
 
 const AppSidebar = () => {
   const { projectId } = UseProject();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const pathname = usePathname();
   const { isCollapsed, toggleSidebar } = useCollapsed();
+
+  const { data: projectResponse } = api.project.getProject.useQuery(
+    { projectId: projectId || '' },
+    { enabled: !!projectId }
+  );
+  const project = projectResponse?.data;
 
   const isActive = (path: string, exact: boolean = false) => {
     if (exact) {
@@ -71,8 +92,7 @@ const AppSidebar = () => {
         </SidebarHeader>
 
         <SidebarContent className="flex flex-col h-[calc(100%-60px)]">
-          <div className="flex-1 overflow-y-auto">
-            {/* Repository Section */}
+          <div className="flex-1 overflow-y-auto scroll-custom">
             <div className="mb-2 p-1">
               {!isCollapsed && (
                 <SidebarGroupLabel className="text-[#666] text-[11px] uppercase font-semibold mb-1 px-2">
@@ -85,14 +105,16 @@ const AppSidebar = () => {
                   href={`/dashboard/${projectId}`} 
                   active={isActive(`/dashboard/${projectId}`, true)}
                   collapsed={isCollapsed}
-                  title="Discussion"
+                  title="Project Overview"
+                  badge={project ? "Active" : undefined}
                 />
                 <NavItem 
                   icon={<MessageCircleCode size={18} />} 
                   href={`/dashboard/${projectId}/chats`} 
                   active={isActive(`/dashboard/${projectId}/chats`)}
                   collapsed={isCollapsed}
-                  title="Chats"
+                  title="AI Chat"
+                  badge="AI"
                 />
                 <NavItem 
                   icon={<FiGitCommit size={18} />} 
@@ -106,14 +128,53 @@ const AppSidebar = () => {
                   href={`/dashboard/${projectId}/pull-requests`} 
                   active={isActive(`/dashboard/${projectId}/pull-requests`)}
                   collapsed={isCollapsed}
-                  title="PRs"
+                  title="Pull Requests"
+                />
+                <NavItem 
+                  icon={<FiAlertCircle size={18} />} 
+                  href={`/dashboard/${projectId}/issues`} 
+                  active={isActive(`/dashboard/${projectId}/issues`)}
+                  collapsed={isCollapsed}
+                  title="Issues"
                 />
                 <NavItem 
                   icon={<FiCode size={18} />} 
                   href={`/dashboard/${projectId}/code`} 
                   active={isActive(`/dashboard/${projectId}/code`)}
                   collapsed={isCollapsed}
-                  title="Code"
+                  title="Code Reference"
+                />
+              </SidebarMenu>
+            </div>
+
+            <div className="mb-2 p-1">
+              {!isCollapsed && (
+                <SidebarGroupLabel className="text-[#666] text-[11px] uppercase font-semibold mb-1 px-2">
+                  AI Features
+                </SidebarGroupLabel>
+              )}
+              <SidebarMenu className="space-y-0.5">
+                <NavItem 
+                  icon={<FaRobot size={18} />} 
+                  href={`/dashboard/${projectId}/ask`} 
+                  active={isActive(`/dashboard/${projectId}/ask`)}
+                  collapsed={isCollapsed}
+                  title="Ask Questions"
+                  badge="New"
+                />
+                <NavItem 
+                  icon={<FaBrain size={18} />} 
+                  href={`/dashboard/${projectId}/analysis`} 
+                  active={isActive(`/dashboard/${projectId}/analysis`)}
+                  collapsed={isCollapsed}
+                  title="Code Analysis"
+                />
+                <NavItem 
+                  icon={<FiZap size={18} />} 
+                  href={`/dashboard/${projectId}/suggestions`} 
+                  active={isActive(`/dashboard/${projectId}/suggestions`)}
+                  collapsed={isCollapsed}
+                  title="AI Suggestions"
                 />
               </SidebarMenu>
             </div>
@@ -156,9 +217,61 @@ const AppSidebar = () => {
                 />
               </SidebarMenu>
             </div>
+
+            <div className="mb-2 p-1">
+              {!isCollapsed && (
+                <SidebarGroupLabel className="text-[#666] text-[11px] uppercase font-semibold mb-1 px-2">
+                  Documentation
+                </SidebarGroupLabel>
+              )}
+              <SidebarMenu className="space-y-0.5">
+                <NavItem 
+                  icon={<FiBookOpen size={18} />} 
+                  href={`/dashboard/${projectId}/docs`} 
+                  active={isActive(`/dashboard/${projectId}/docs`)}
+                  collapsed={isCollapsed}
+                  title="Documentation"
+                />
+                <NavItem 
+                  icon={<FiShield size={18} />} 
+                  href={`/dashboard/${projectId}/security`} 
+                  active={isActive(`/dashboard/${projectId}/security`)}
+                  collapsed={isCollapsed}
+                  title="Security"
+                />
+                <NavItem 
+                  icon={<FiPlay size={18} />} 
+                  href={`/dashboard/${projectId}/deployment`} 
+                  active={isActive(`/dashboard/${projectId}/deployment`)}
+                  collapsed={isCollapsed}
+                  title="Deployment"
+                />
+              </SidebarMenu>
+            </div>
           </div>
 
-          {/* Bottom Section */}
+          {!isCollapsed && (
+            <div className="p-3 border-t border-[#383838]">
+              <Card className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="relative">
+                      <FaRobot className="w-4 h-4 text-green-400" />
+                      <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-white rounded-full flex items-center justify-center">
+                        <SiOpenai className="w-1 h-1 text-emerald-600" />
+                      </div>
+                    </div>
+                    <span className="text-xs font-semibold text-green-400">AI Assistant</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-gray-400">Online & Ready</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
           <div className="p-1 border-t border-[#383838]">
             <SidebarMenu className="space-y-0.5">
               <NavItem 
@@ -222,19 +335,21 @@ const NavItem = ({
   active, 
   collapsed, 
   title,
-  onClick 
+  onClick,
+  badge
 }: { 
   icon: React.ReactNode, 
   href?: string,
   active?: boolean,
   collapsed: boolean,
   title: string,
-  onClick?: () => void
+  onClick?: () => void,
+  badge?: string
 }) => {
   const content = (
     <div
       className={cn(
-        'flex items-center p-2 rounded-md transition-colors duration-200',
+        'flex items-center p-2 rounded-md transition-colors duration-200 relative',
         {
           'bg-[#383838] text-white': active,
           'hover:bg-[#333] text-[#aaa]': !active,
@@ -245,7 +360,24 @@ const NavItem = ({
       onClick={onClick}
     >
       <span className="flex-shrink-0">{icon}</span>
-      {!collapsed && <span className="ml-2 text-sm truncate">{title}</span>}
+      {!collapsed && (
+        <div className="flex items-center justify-between flex-1 ml-2">
+          <span className="text-sm truncate">{title}</span>
+          {badge && (
+            <Badge 
+              variant="secondary" 
+              className={cn(
+                "text-xs px-1.5 py-0.5",
+                badge === "AI" ? "bg-green-500/20 text-green-400 border-green-500/30" :
+                badge === "New" ? "bg-blue-500/20 text-blue-400 border-blue-500/30" :
+                "bg-gray-500/20 text-gray-400 border-gray-500/30"
+              )}
+            >
+              {badge}
+            </Badge>
+          )}
+        </div>
+      )}
     </div>
   );
 
