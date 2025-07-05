@@ -22,7 +22,7 @@ export const loadRepositoryDocuments = async (
 ): Promise<Document[]> => {
     const {
         branch: initialBranch = 'main', 
-        ignoreFiles = ['package.json', 'package-lock.json', 'pnpm-lock.yaml', 'bun.lockb'],
+        ignoreFiles = ['package-lock.json', 'pnpm-lock.yaml', 'bun.lockb'],
         recursive = true,
         unknownHandling = 'warn',
         maxConcurrency = 5,

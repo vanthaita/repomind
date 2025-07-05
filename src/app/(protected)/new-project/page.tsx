@@ -13,6 +13,7 @@ import { RiGitRepositoryLine, RiVerifiedBadgeFill } from 'react-icons/ri';
 import { SiOpenai } from 'react-icons/si';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { LoadingButton } from '@/components/ui/loading';
 
 type FormInput = {
   repoUrl: string;
@@ -30,7 +31,7 @@ const NewProjectPage = () => {
 
   const onSubmit = async (data: FormInput) => {
     await createProject.mutateAsync({
-      reponame: data.projectName,
+      name: data.projectName,
       githubUrl: data.repoUrl,
       githubToken: data.githubToken,
     }, {

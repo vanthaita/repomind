@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ArrowUpRight } from 'react-feather';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SectionLoading, PullRequestSkeleton } from '@/components/ui/loading';
 
 interface AIAnalysisData {
     summary?: string[];
@@ -102,19 +103,38 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ analysis }) => {
 };
 const PullRequest: React.FC = () => {
   const { projectId } = UseProject();
-  const { data: pullRequests, isLoading } = api.project.getPullRequests.useQuery({ projectId });
+  const { data: pullRequestsResponse, isLoading } = api.project.getPullRequests.useQuery({ 
+    projectId,
+    page: 1,
+    limit: 20,
+  });
+  const pullRequests = pullRequestsResponse?.data || [];
   const [selectedPrId, setSelectedPrId] = useState<string | null>(null);
 
   if (isLoading) return (
-    <div className="p-6 space-y-4">
-      <Skeleton className="h-8 w-1/3" />
-      <Skeleton className="h-[100px] w-full" />
-      <Skeleton className="h-8 w-1/3" />
-      <Skeleton className="h-[100px] w-full" />
+    <div className="p-4 bg-[#282828] min-h-screen">
+      <div className="space-y-8">
+        <div>
+          <h2 className="text-xl font-semibold mb-4 text-green-500">Open Pull Requests</h2>
+          <div className="space-y-2">
+            {[...Array(3)].map((_, i) => (
+              <PullRequestSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold mb-4 text-green-500">Closed Pull Requests</h2>
+          <div className="space-y-2">
+            {[...Array(2)].map((_, i) => (
+              <PullRequestSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 
-  if (!pullRequests) return <div className="p-6">No pull requests found.</div>;
+  if (!pullRequestsResponse) return <div className="p-6">No pull requests found.</div>;
 
   const selectedPr = pullRequests.find(pr => pr.id === selectedPrId);
   console.log(pullRequests[0]?.aiAnalysis)

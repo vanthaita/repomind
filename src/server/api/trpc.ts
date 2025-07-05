@@ -79,6 +79,11 @@ export const createCallerFactory = t.createCallerFactory;
 export const createTRPCRouter = t.router;
 
 /**
+ * Export middleware for creating custom middleware
+ */
+export const middleware = t.middleware;
+
+/**
  * Middleware for timing procedure execution and adding an artificial delay in development.
  *
  * You can remove this if you don't like it, but it can help catch unwanted waterfalls by simulating
@@ -102,13 +107,40 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
 });
 
 /**
+ * Logging middleware for better debugging
+ */
+const loggingMiddleware = t.middleware(async ({ next, path, input, ctx }) => {
+  const start = Date.now();
+  
+  // Log request
+  console.log(`[TRPC] ${path} - User: ${ctx.session?.user?.id || 'anonymous'}`);
+  
+  try {
+    const result = await next();
+    const end = Date.now();
+    
+    // Log success
+    console.log(`[TRPC] ${path} - Success (${end - start}ms)`);
+    
+    return result;
+  } catch (error) {
+    const end = Date.now();
+    
+    // Log error
+    console.error(`[TRPC] ${path} - Error (${end - start}ms):`, error);
+    
+    throw error;
+  }
+});
+
+/**
  * Public (unauthenticated) procedure
  *
  * This is the base piece you use to build new queries and mutations on your tRPC API. It does not
  * guarantee that a user querying is authorized, but you can still access user session data if they
  * are logged in.
  */
-export const publicProcedure = t.procedure.use(timingMiddleware);
+export const publicProcedure = t.procedure.use(timingMiddleware).use(loggingMiddleware);
 
 /**
  * Protected (authenticated) procedure
@@ -120,6 +152,7 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
  */
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
+  .use(loggingMiddleware)
   .use(({ ctx, next }) => {
     if (!ctx.session || !ctx.session.user) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -132,3 +165,14 @@ export const protectedProcedure = t.procedure
       },
     });
   });
+
+/**
+ * Admin procedure - for admin-only operations
+ */
+export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
+  // Add admin role check here when you implement roles
+  // if (!ctx.user.role || ctx.user.role !== 'admin') {
+  //   throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+  // }
+  return next({ ctx });
+});

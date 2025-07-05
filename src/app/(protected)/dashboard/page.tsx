@@ -5,6 +5,7 @@ import { Octokit } from 'octokit';
 import { useRouter } from 'next/navigation';
 import { FiGithub, FiStar, FiGitBranch, FiEye, FiCode, FiPlus } from 'react-icons/fi';
 import Link from 'next/link';
+import { SectionLoading, ProjectCardSkeleton } from '@/components/ui/loading';
 
 interface RepoData {
   name: string;
@@ -23,6 +24,7 @@ const DashboardPage = () => {
   const { projectId, projects, setProjectId } = UseProject();
   const [repoData, setRepoData] = useState<Record<string, RepoData>>({});
   const [loading, setLoading] = useState<Record<string, boolean>>({});
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   const handleProjectChange = (newProjectId: string) => {
@@ -32,7 +34,10 @@ const DashboardPage = () => {
 
   useEffect(() => {
     const fetchAllReposData = async () => {
-      if (!projects || projects.length === 0) return;
+      if (!projects || projects.length === 0) {
+        setIsLoading(false);
+        return;
+      }
 
       const newRepoData: Record<string, RepoData> = {};
       const newLoading: Record<string, boolean> = {};
@@ -67,6 +72,7 @@ const DashboardPage = () => {
 
       setRepoData(prev => ({ ...prev, ...newRepoData }));
       setLoading(prev => ({ ...prev, ...newLoading }));
+      setIsLoading(false);
     };
 
     fetchAllReposData();
@@ -90,6 +96,19 @@ const DashboardPage = () => {
     const repo = match[2];
     return repoData[`${owner}/${repo}`];
   };
+
+  if (isLoading) {
+    return (
+      <div className="p-6">
+        <h1 className="text-2xl font-bold mb-6">Your Projects</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <ProjectCardSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">

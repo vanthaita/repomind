@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
 import RippleLoader from '../loading';
+import { PageLoading } from '@/components/ui/loading';
 
 type Props = {
   children: React.ReactNode;
@@ -8,7 +9,7 @@ type Props = {
 const DashboardLayout = ({ children }: Props) => {
   return (
     <main className='bg-[#282828]' suppressHydrationWarning>
-    <Suspense fallback={<RippleLoader />}>
+    <Suspense fallback={<PageLoading />}>
       {children}
     </Suspense>  
     </main>

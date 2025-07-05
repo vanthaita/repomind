@@ -2,7 +2,7 @@
 
 import UseProject from '@/hooks/use-project';
 import React, { useState, useEffect, useRef } from 'react';
-import { ChangeNameConversation, createAssistantMessage, createUserMessage, generateRecommendationQuestions, streamAndGenerateAnswer } from './action';
+import { ChangeNameConversation, createAssistantMessage, createUserMessage, generateRecommendationQuestions, streamAndGenerateAnswer } from '../../../lib/action';
 import { readStreamableValue } from 'ai/rsc';
 import MarkDown from '@uiw/react-md-editor';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { api } from '@/trpc/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import useRefetch from '@/hooks/use-refresh';
+import { SectionLoading, MessageSkeleton } from '@/components/ui/loading';
 
 export const listAskQuestionDefault = [
   "Can you explain the main functionality of the core modules?",
@@ -50,14 +51,21 @@ const AskQuestion = ({conversationId}: Props) => {
       sourceCode: string | null; 
     }[];
   }[]>([]);
-  const { data: conversationData } = api.project.getConversation.useQuery({
+  const { data: conversationResponse, isLoading: isLoadingConversation } = api.conversation.getConversation.useQuery({
     conversationId,
   });
+  const conversationData = conversationResponse?.data;
   const utils = api.useUtils();
 
   useEffect(() => {
     if (conversationData?.messages) {
-      setMessages(conversationData.messages);
+      const formattedMessages = conversationData.messages.map((msg: any) => ({
+        id: msg.id,
+        role: msg.role,
+        content: msg.content,
+        fileReference: msg.fileReference || [],
+      }));
+      setMessages(formattedMessages);
     }
   }, [conversationData]);
 
@@ -115,9 +123,17 @@ const AskQuestion = ({conversationId}: Props) => {
         prev.map(msg => msg.id === tempId ? assistantMessage : msg)
       );
       
-      await utils.project.getConversation.invalidate({ conversationId });
-      const newData = utils.project.getConversation.getData({ conversationId });
-      if (newData) setMessages(newData.messages);
+      await utils.conversation.getConversation.invalidate({ conversationId });
+      const newData = utils.conversation.getConversation.getData({ conversationId });
+      if (newData?.data?.messages) {
+        const formattedMessages = newData.data.messages.map((msg: any) => ({
+          id: msg.id,
+          role: msg.role,
+          content: msg.content,
+          fileReference: msg.fileReference || [],
+        }));
+        setMessages(formattedMessages);
+      }
        if (conversationData?.title === 'Untitled') {
         const changeNameConversation = await ChangeNameConversation(q, conversationId);
         refetch();
@@ -157,6 +173,20 @@ const AskQuestion = ({conversationId}: Props) => {
     }
   };
   
+  if (isLoadingConversation) {
+    return (
+      <div className="flex h-full w-full">
+        <div className="w-full flex flex-col relative">
+          <div className="flex-1 overflow-auto scroll-custom p-4 w-full">
+            {[...Array(3)].map((_, i) => (
+              <MessageSkeleton key={i} isUser={i % 2 === 0} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full w-full">
       <div className={`w-full flex flex-col relative`}>

@@ -5,15 +5,21 @@ import Link from 'next/link';
 import { MessageCircle, ChevronRight, Plus, Loader2 } from 'lucide-react'; 
 import UseProject from '@/hooks/use-project';
 import { Button } from '@/components/ui/button';
-import { persistConversation } from './action';
+import { persistConversation } from '../../../lib/action';
 import { useRouter } from 'next/navigation';
 import useRefetch from '@/hooks/use-refresh';
+import { SectionLoading, ConversationSkeleton } from '@/components/ui/loading';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const AskList = () => {
     const { projectId } = UseProject();
-    const { data: conversations } = api.project.getConversations.useQuery({ projectId });
+    const { data: conversationsResponse, isLoading: isLoadingConversations } = api.conversation.getConversations.useQuery({ 
+  projectId,
+  page: 1,
+  limit: 20,
+});
+const conversations = conversationsResponse?.data || [];
     const [isLoading, setIsLoading] = React.useState(false); 
     const router = useRouter();
     const refetch = useRefetch();
@@ -58,7 +64,11 @@ const AskList = () => {
                     </div>
 
                     <div className='space-y-3'>
-                        {conversations?.length ? conversations.map((conversation) => (
+                        {isLoadingConversations ? (
+                            [...Array(3)].map((_, i) => (
+                                <ConversationSkeleton key={i} />
+                            ))
+                        ) : conversations?.length ? conversations.map((conversation) => (
                             <Link
                                 key={conversation.id}
                                 href={`/dashboard/chat/${conversation.id}`}

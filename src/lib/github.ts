@@ -78,7 +78,7 @@ const summarizeCommit = async (githubUrl: string, commitHash: string) => {
       Accept: 'application/vnd.github.v3.diff',
     },
   });
-  return (await aiSummariesCommitTogetherAI(diffData.data)) as string;
+  return (await aiSummariesCommitTogetherAI('commit-diff', diffData.data)) as string;
 };
 
 const getProjectGithubUrl = async (projectId: string) => {

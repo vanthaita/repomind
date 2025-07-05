@@ -5,6 +5,7 @@ import { type Metadata } from "next";
 import { ToastContainer } from 'react-toastify';
 import { TRPCReactProvider } from "@/trpc/react";
 import { SessionProvider } from "next-auth/react"
+import { LoadingProvider } from '@/components/providers/LoadingProvider'
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
@@ -22,7 +23,9 @@ export default function RootLayout({
         <body className="font-sans antialiased bg-neutral-950 text-white scroll-custom" suppressHydrationWarning>
           <TRPCReactProvider>
             <SessionProvider>
-              {children}
+              <LoadingProvider>
+                {children}
+              </LoadingProvider>
             </SessionProvider>
             <ToastContainer />
           </TRPCReactProvider>

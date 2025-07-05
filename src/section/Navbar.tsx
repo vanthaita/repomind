@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react"; 
 import { signIn, signOut, useSession } from "next-auth/react";
 import CollapsibleBanner from "@/components/Banner";
+import { LoadingButton } from '@/components/ui/loading';
+import { Logo } from '@/components/ui/logo';
 
 const navlinks = [
     { label: "Interactive Demo", href: "/" },
@@ -66,8 +68,8 @@ const Navbar = () => {
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-2 lg:grid-cols-3 items-center">
                     <div className="flex justify-start lg:justify-center">
-                        <Link href="/" className="font-extrabold text-[1.7rem] leading-[3rem] cursor-pointer text-white">
-                            Repo<strong className="bg-green-500 text-white px-1 rounded">Mind</strong>
+                        <Link href="/" className="cursor-pointer">
+                            <Logo size="sm" animated={false} />
                         </Link>
                     </div>
                     <div className="lg:flex justify-center items-center hidden">

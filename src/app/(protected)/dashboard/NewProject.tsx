@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import EmojiConfetti from '@/components/Emoji';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaGithub, FaTimes, FaKey, FaProjectDiagram } from 'react-icons/fa';
+import { LoadingButton } from '@/components/ui/loading';
 
 type FormInput = {
   repoUrl: string;
@@ -28,7 +29,7 @@ const CreatePage = ({ isModalOpen, setIsModalOpen }: CreatePageProps) => {
 
   const onSubmit = async (data: FormInput) => {
     await createProject.mutateAsync({
-      reponame: data.projectName,
+      name: data.projectName,
       githubUrl: data.repoUrl,
       githubToken: data.githubToken,
     }, {

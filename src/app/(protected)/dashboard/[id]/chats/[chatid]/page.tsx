@@ -3,6 +3,7 @@ import React from 'react'
 import useProject from '@/hooks/use-project'
 import { usePathname } from 'next/navigation'
 import AskQuestion from '../../../askQuestion'
+import { SectionLoading } from '@/components/ui/loading'
 
 const ChatPage = () => {
     const { project } = useProject()

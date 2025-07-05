@@ -1,0 +1,25 @@
+// Validation Constants
+export const VALIDATION_RULES = {
+  MIN_PASSWORD_LENGTH: 8,
+  MAX_PASSWORD_LENGTH: 128,
+  MIN_USERNAME_LENGTH: 3,
+  MAX_USERNAME_LENGTH: 50,
+  MIN_PROJECT_NAME_LENGTH: 1,
+  MAX_PROJECT_NAME_LENGTH: 100,
+  MAX_GITHUB_URL_LENGTH: 500,
+  MAX_COMMIT_MESSAGE_LENGTH: 1000,
+  MAX_PULL_REQUEST_TITLE_LENGTH: 200,
+  MAX_PULL_REQUEST_BODY_LENGTH: 10000,
+  MAX_CONVERSATION_TITLE_LENGTH: 200,
+  MAX_MESSAGE_CONTENT_LENGTH: 10000,
+} as const;
+
+// Regex Patterns
+export const REGEX_PATTERNS = {
+  GITHUB_URL: /^https:\/\/github\.com\/[^\/]+\/[^\/]+$/,
+  GITHUB_TOKEN: /^ghp_[a-zA-Z0-9]{36}$/,
+  EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  URL: /^https?:\/\/.+/,
+  ALPHANUMERIC: /^[a-zA-Z0-9]+$/,
+  ALPHANUMERIC_WITH_DASHES: /^[a-zA-Z0-9-]+$/,
+} as const; 
