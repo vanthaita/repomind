@@ -71,7 +71,7 @@ model Project {
     githubUrl  String?
     githubToken String?
     
-    delete     DateTime?
+    deletedAt  DateTime?
 
     UserProject UserProject[]
 
@@ -82,6 +82,8 @@ model Project {
     SourceCodeEmbedding SourceCodeEmbedding[]
 
     Conversation Conversation[]
+
+    Issue Issue[]
 }
 
 model UserProject {
@@ -184,4 +186,17 @@ model PullRequest {
   mergedAt     DateTime?
   
   @@unique([projectId, prNumber])
+}
+
+model Issue {
+  id        String   @id @default(uuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  title     String
+  body      String?
+  status    String   // open, closed, etc.
+  labels    String?  // JSON string array
+  assignee  String?  // user id or name
+  createdAt DateTime @default(now())
+  closedAt  DateTime?
 }
