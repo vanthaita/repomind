@@ -4,9 +4,14 @@ import {useLocalStorage} from 'usehooks-ts';
 import UseProject from './use-project';
 const UseConversation = () => {
     const { projectId } = UseProject();
-    const { data: conversations } = api.project.getConversations.useQuery({ projectId });
+    const { data: conversationsResponse } = api.conversation.getConversations.useQuery({ 
+      projectId,
+      page: 1,
+      limit: 20,
+    });
     const [conversationId, setConversationId] = useLocalStorage('conversationId', ' ');
-    const conversation = conversations?.find(conversation => conversation.id === conversationId);
+    const conversations = conversationsResponse?.data || [];
+    const conversation = conversations.find((conversation: any) => conversation.id === conversationId);
     return {
         conversations,
         conversation,

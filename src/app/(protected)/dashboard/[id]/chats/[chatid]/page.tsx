@@ -1,11 +1,12 @@
 'use client'
 import React from 'react'
-import AskQuestion from '../../askQuestion'
 import useProject from '@/hooks/use-project'
 import { usePathname } from 'next/navigation'
+import AskQuestion from '../../../askQuestion'
+import { SectionLoading } from '@/components/ui/loading'
 
 const ChatPage = () => {
-    const { project, projectId } = useProject()
+    const { project } = useProject()
     const pathname = usePathname(); 
     const segments = pathname.split('/');
     const id = segments[segments.length - 1];
@@ -25,7 +26,7 @@ const ChatPage = () => {
                         </p>
                     </div>
                 </header>
-            <div className="flex-1 flex items-center justify-center">
+                <div className="flex-1 flex items-center justify-center">
                     <p className="text-gray-300">Invalid conversation ID.</p>
                 </div>
             </section>
@@ -33,8 +34,10 @@ const ChatPage = () => {
     }
 
     return (
-        <section className='h-screen flex flex-col bg-[#282828] text-white overflow-hidden'>
-            <AskQuestion conversationId={id} />
+        <section className='h-screen flex flex-col  text-white overflow-hidden'>
+            <div className="flex-1 overflow-auto">
+                <AskQuestion conversationId={id} />
+            </div>
         </section>
     )
 }

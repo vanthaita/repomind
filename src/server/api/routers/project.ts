@@ -1,124 +1,181 @@
-import { processCommits, processPullRequests } from "@/lib/github";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import z from 'zod'
-import pLimit from 'p-limit';
-import { processGithubRepository } from "@/lib/github-loader";
-import { db } from "@/server/db";
-const limit = pLimit(14);
+import { z } from 'zod';
+
+// Import schemas
+import {
+  createProjectSchema,
+  updateProjectSchema,
+  getProjectsSchema,
+  projectIdSchema,
+  githubImportSchema,
+} from '../schemas/project';
+
 export const projectRouter = createTRPCRouter({
-    createProject: protectedProcedure.input(
-        z.object({
-            reponame: z.string(),
-            githubUrl: z.string(),
-            githubToken: z.string().optional(),
-        })
-    ).mutation(async ({ctx, input}) => {
-        const project = await ctx.db.project.create({
-            data: {
-                name: input.reponame,
-                githubUrl: input.githubUrl,
-                githubToken: input.githubToken,
-                UserProject: {
-                    create: {
-                        userId: ctx.user.id!
-                    }
-                }
+  getProjects: protectedProcedure
+    .input(getProjectsSchema)
+    .query(async ({ ctx, input }) => {
+      try {
+        const { page, limit, search, isPublic, sortBy, sortOrder } = input;
+        const offset = (page - 1) * limit;
+
+        const where: any = {
+          UserProject: {
+            some: {
+              userId: ctx.user.id as string,
             },
-        });
-    
-        try {
-            await processCommits(project.id);
-            await processPullRequests(project.id);
-            await processGithubRepository(project.id, input.githubUrl, input.githubToken);
-            return project;
-        } catch (error) {
-            await ctx.db.userProject.deleteMany({
-                where: {
-                    projectId: project.id,
-                },
-            });
-            await ctx.db.project.delete({
-                where: {
-                    id: project.id,
-                },
-            });
-            throw new Error("Failed to initialize project: " + error);
+          },
+        };
+
+        if (search) {
+          where.OR = [
+            { name: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+          ];
         }
-    }),
-    getProjects: protectedProcedure.query(async ({ctx, input}) => {
-        return await ctx.db.project.findMany({
-            where: {
-                UserProject: {
-                    some: {
-                        userId: ctx.user.id as string
-                    }
-                },
-                delete: null
-            }
-        })
-    }),
-    getCommits: protectedProcedure.input(
-        z.object({
-            projectId: z.string(),
-        })
-    ).query(async ({ctx, input}) => {
-        return await ctx.db.commit.findMany({where: {projectId: input.projectId} });
-    }),
-    getPullRequests: protectedProcedure.input(
-        z.object({
-            projectId: z.string(),
-        })
-    ).query(async ({ctx, input}) => {
-        return await ctx.db.pullRequest.findMany({where: {projectId: input.projectId}});
-    }),
-    importCommits: protectedProcedure.input(
-        z.object({
-            projectId: z.string(),
-        })
-    ).mutation(async ({ ctx, input }) => {
-        await processCommits(input.projectId);
-    }),
-    importPullRequests: protectedProcedure.input(
-        z.object({
-            projectId: z.string(),
-        })
-    ).mutation(async ({ ctx, input }) => {
-        await processPullRequests(input.projectId);
-    }),
-    importGithubRepo: protectedProcedure.input(
-        z.object({
-            projectId: z.string(),
-            githubUrl: z.string(),
-            githubToken: z.string(),
-        })
-    ).mutation(async ({ ctx, input }) => {
-        await processGithubRepository(input.projectId, input.githubUrl!, input.githubToken)
-    }),
-    getConversation: protectedProcedure
-        .input(z.object({ conversationId: z.string() }))
-        .query(async ({ ctx, input }) => {
-            return await db.conversation.findUnique({
-                where: { id: input.conversationId },
+
+        if (isPublic !== undefined) {
+          where.isPublic = isPublic;
+        }
+
+        const sortFieldMap: Record<string, string> = {
+          createdAt: 'created_at',
+          updatedAt: 'updated_at',
+          name: 'name',
+        };
+        const prismaSortBy = sortFieldMap[sortBy] || 'created_at';
+
+        const [projects, total] = await Promise.all([
+          ctx.db.project.findMany({
+            where,
+            include: {
+              UserProject: {
                 include: {
-                messages: {
-                    include: { fileReference: true },
-                    orderBy: { created_at: "asc" },
+                  user: {
+                    select: {
+                      id: true,
+                      name: true,
+                      email: true,
+                    },
+                  },
                 },
-                },
-            });
-    }),
-    getConversations: protectedProcedure
-        .input(z.object({ projectId: z.string() }))
-        .query(async ({ ctx, input }) => {
-            return await db.conversation.findMany({
-                where: { projectId: input.projectId },
+              },
+              _count: {
                 select: {
-                    id: true,
-                    title: true,
+                  Commit: true,
+                  PullRequest: true,
+                  Conversation: true,
                 },
-                orderBy: {
-                    createdAt: "desc"
-                }
-            });
+              },
+            },
+            orderBy: { [prismaSortBy]: sortOrder },
+            skip: offset,
+            take: limit,
+          }),
+          ctx.db.project.count({ where }),
+        ]);
+
+        return {
+          success: true,
+          data: projects,
+          pagination: {
+            page,
+            limit,
+            total,
+            pages: Math.ceil(total / limit),
+          },
+        };
+      } catch (error) {
+        console.error('Error in getProjects:', error);
+        throw error;
+      }
     }),
-})
+
+  createProject: protectedProcedure
+    .input(createProjectSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const project = await ctx.db.project.create({
+          data: {
+            name: input.name,
+            githubUrl: input.githubUrl,
+            githubToken: input.githubToken,
+            UserProject: {
+              create: {
+                userId: ctx.user.id!,
+              },
+            },
+          },
+          include: {
+            UserProject: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        return {
+          success: true,
+          data: project,
+        };
+      } catch (error) {
+        console.error('Error in createProject:', error);
+        throw error;
+      }
+    }),
+
+  getProject: protectedProcedure
+    .input(projectIdSchema)
+    .query(async ({ ctx, input }) => {
+      try {
+        const project = await ctx.db.project.findFirst({
+          where: {
+            id: input.projectId,
+            UserProject: {
+              some: {
+                userId: ctx.user.id as string,
+              },
+            },
+          },
+          include: {
+            UserProject: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                  },
+                },
+              },
+            },
+            _count: {
+              select: {
+                Commit: true,
+                PullRequest: true,
+                Conversation: true,
+              },
+            },
+          },
+        });
+
+        if (!project) {
+          throw new Error('Project not found');
+        }
+
+        return {
+          success: true,
+          data: project,
+        };
+      } catch (error) {
+        console.error('Error in getProject:', error);
+        throw error;
+      }
+    }),
+});

@@ -5,7 +5,7 @@ const together = new Together({
     apiKey: process.env.NEXT_PUBLIC_TOGETHER_API_KEY,
 });
 
-export const aiSummariesCommitTogetherAI = async (diff: string) => {
+export const aiSummariesCommitTogetherAI = async (fileName: string, code: string) => {
     const response = await together.chat.completions.create({
         messages: [
             {
@@ -43,10 +43,16 @@ export const aiSummariesCommitTogetherAI = async (diff: string) => {
             },
             {
                 role: 'user',
-                content: `Please summarize the following diff file: \n\n${diff}`
+                content: `await PromptLoader.loadAndRender(
+                    PROMPT_NAMES.CODE_SUMMARY_TOGETHER,
+                    {
+                    fileName: ${fileName},
+                    code: ${code}
+                    }
+                )`
             }
         ],
-        model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+        model: "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
     })
     console.log(response.choices[0]?.message?.content);
     return response.choices[0]?.message?.content
@@ -86,7 +92,7 @@ export const generateSummaryDocTogetherAI = async (doc: Document): Promise<strin
     try {
         const code = doc.pageContent.slice(0, 10000);
         const response = await together.chat.completions.create({
-            model: 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
+            model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free',
             messages: [
                 {
                     role: 'system',
@@ -99,13 +105,13 @@ export const generateSummaryDocTogetherAI = async (doc: Document): Promise<strin
                     - Key Functionalities: What are the essential functions or actions this code performs to meet its objective?
                     - Notable Aspects:  Are there any significant coding patterns, design choices, algorithms, or best practices demonstrated in this code that a junior developer should be aware of?
                     Your summary should be easy to understand for someone new to the codebase. Aim for clarity and conciseness, ideally around 100 words. Prioritize conveying the most important information effectively.
+import { PromptLoader, PROMPT_NAMES } from '@/lib/prompt-loader';
                     Code snippet:
                     ---
                         ${code}
                     ---`,
                 },
             ],
-            temperature: 0.7,
         });
         const summary = response.choices[0]?.message?.content || '';
         return summary;

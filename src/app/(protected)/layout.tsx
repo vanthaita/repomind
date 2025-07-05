@@ -1,20 +1,20 @@
-import { SidebarProvider } from '@/components/ui/sidebar';
 import React, { Suspense } from 'react';
-import AppSidebar from './appSidebar';
-import ContentProvider from '@/provider/ContentProvider';
+import RippleLoader from '../loading';
+import { PageLoading } from '@/components/ui/loading';
 
 type Props = {
   children: React.ReactNode;
 };
 
-const SidebarLayout = ({ children }: Props) => {
+const DashboardLayout = ({ children }: Props) => {
   return (
-    <SidebarProvider>
-          <ContentProvider>
-          {children}
-        </ContentProvider>
-    </SidebarProvider>
+    <main className='bg-[#282828]' suppressHydrationWarning>
+    <Suspense fallback={<PageLoading />}>
+      {children}
+    </Suspense>  
+    </main>
+    
   );
 };
 
-export default SidebarLayout;
+export default DashboardLayout;

@@ -7,12 +7,31 @@ import { Button } from '@/components/ui/button';
 import { ArrowUpRight, Code } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import UseProject from '@/hooks/use-project';
+import { SectionLoading, CommitSkeleton } from '@/components/ui/loading';
 
 const CommitLog = () => {
   const { projectId, project } = UseProject();
-  const { data: commits } = api.project.getCommits.useQuery({ projectId });
+  const { data: commitsResponse, isLoading } = api.project.getCommits.useQuery({ 
+    projectId,
+    page: 1,
+    limit: 20,
+  });
+  const commits = commitsResponse?.data || [];
 
-  if (!commits) {
+  if (isLoading) {
+    return (
+      <div className="mt-4 text-white mb-4">
+        <h1 className="text-xl font-semibold mb-4 text-green-500">Summary Commit Log</h1>
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <CommitSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!commitsResponse) {
     return <div className="text-white mt-4">Loading commits...</div>;
   }
 

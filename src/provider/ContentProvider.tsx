@@ -1,7 +1,6 @@
 'use client';
 
 import AppSidebar from "@/app/(protected)/appSidebar";
-import useCollapsed from "@/hooks/use-collapsed";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -9,14 +8,12 @@ type Props = {
 };
 
 const ContentProvider = ({ children }: Props) => {
-  const { isCollapsed } = useCollapsed();
-
   return (
-    <div className="flex flex-1"> 
+    <div className="flex w-full"> 
       <div className="hidden md:block">
         <AppSidebar />
       </div>
-      <div className={cn('w-full transition-all duration-300')}>
+      <div className={cn('w-full transition-all duration-300 ')}>
         {children}
       </div>
     </div>
