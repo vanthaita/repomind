@@ -12,7 +12,8 @@ type Props = {
 
 const DashboardLayout = ({ children }: Props) => {
   return (
-    <main suppressHydrationWarning>
+    <main suppressHydrationWarning className='scroll-custom'
+    >
       <SidebarProvider>
         <ContentProvider>
           <Suspense fallback={<PageLoading />}>

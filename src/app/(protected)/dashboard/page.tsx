@@ -253,10 +253,10 @@ const DashboardPage = () => {
   const stats = getProjectStats();
 
   return (
-    <div className="min-h-screen bg-[#282828] p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#232323] p-6">
+      <div className="max-w-7xl mx-auto flex flex-col gap-0">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-0 pb-6">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-green-500/10 rounded-lg">
               <FiFolder className="w-7 h-7 text-green-400" />
@@ -274,11 +274,12 @@ const DashboardPage = () => {
             <span className="font-medium">New Project</span>
           </Button>
         </div>
+        <div className="border-b border-[#353535] mb-0" />
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-[#424242] border-[#383838] hover:border-green-500/50 transition-all duration-200">
-            <CardContent className="p-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-6">
+          <Card className="bg-transparent border-none shadow-none rounded-none p-0">
+            <CardContent className="p-0">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">Total Projects</p>
@@ -288,9 +289,8 @@ const DashboardPage = () => {
               </div>
             </CardContent>
           </Card>
-          
-          <Card className="bg-[#424242] border-[#383838] hover:border-green-500/50 transition-all duration-200">
-            <CardContent className="p-4">
+          <Card className="bg-transparent border-none shadow-none rounded-none p-0">
+            <CardContent className="p-0">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">Public</p>
@@ -300,9 +300,8 @@ const DashboardPage = () => {
               </div>
             </CardContent>
           </Card>
-          
-          <Card className="bg-[#424242] border-[#383838] hover:border-green-500/50 transition-all duration-200">
-            <CardContent className="p-4">
+          <Card className="bg-transparent border-none shadow-none rounded-none p-0">
+            <CardContent className="p-0">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">Private</p>
@@ -312,9 +311,8 @@ const DashboardPage = () => {
               </div>
             </CardContent>
           </Card>
-          
-          <Card className="bg-[#424242] border-[#383838] hover:border-green-500/50 transition-all duration-200">
-            <CardContent className="p-4">
+          <Card className="bg-transparent border-none shadow-none rounded-none p-0">
+            <CardContent className="p-0">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">Archived</p>
@@ -325,432 +323,121 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
         </div>
+        <div className="border-b border-[#353535] mb-0" />
 
         {/* Search and Filters */}
-        <div className="flex flex-col lg:flex-row gap-4 mb-8">
+        <div className="flex flex-col lg:flex-row gap-5 py-6">
           <div className="relative flex-1">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               placeholder="Search projects..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-[#424242] border-[#383838] text-white placeholder-gray-400 focus:border-green-500"
+              className="pl-12 pr-4 py-3 min-h-[44px] bg-[#232323] border-[#353535] text-white placeholder-gray-400 focus:border-green-500 rounded-xl text-base"
             />
           </div>
-          
-          <div className="flex gap-2">
+          <div className="flex gap-3 flex-wrap">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="bg-[#424242] border-[#383838] text-white hover:bg-[#383838]">
-                  <FiFilter className="w-4 h-4 mr-2" />
-                  Filter
+                <Button variant="outline" className="bg-[#232323] border-[#353535] text-white hover:bg-[#353535] rounded-xl px-4 py-3 min-h-[44px] text-base flex items-center gap-2">
+                  <FiFilter className="w-5 h-5" />
+                  <span>Filter</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-[#424242] border-[#383838]">
-                <DropdownMenuItem 
-                  onClick={() => setSelectedFilter('all')}
-                  className="text-white hover:bg-[#383838]"
-                >
-                  All Projects
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setSelectedFilter('public')}
-                  className="text-white hover:bg-[#383838]"
-                >
-                  Public Only
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setSelectedFilter('private')}
-                  className="text-white hover:bg-[#383838]"
-                >
-                  Private Only
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setSelectedFilter('archived')}
-                  className="text-white hover:bg-[#383838]"
-                >
-                  Archived
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setSelectedFilter('fork')}
-                  className="text-white hover:bg-[#383838]"
-                >
-                  Forks
-                </DropdownMenuItem>
+              <DropdownMenuContent className="bg-[#232323] border-[#353535] rounded-xl">
+                <DropdownMenuItem onClick={() => setSelectedFilter('all')} className="text-white hover:bg-[#353535] py-3 text-base">All Projects</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedFilter('public')} className="text-white hover:bg-[#353535] py-3 text-base">Public Only</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedFilter('private')} className="text-white hover:bg-[#353535] py-3 text-base">Private Only</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedFilter('archived')} className="text-white hover:bg-[#353535] py-3 text-base">Archived</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedFilter('fork')} className="text-white hover:bg-[#353535] py-3 text-base">Forks</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="bg-[#424242] border-[#383838] text-white hover:bg-[#383838]">
-                  <FiTrendingUp className="w-4 h-4 mr-2" />
-                  Sort
+                <Button variant="outline" className="bg-[#232323] border-[#353535] text-white hover:bg-[#353535] rounded-xl px-4 py-3 min-h-[44px] text-base flex items-center gap-2">
+                  <FiTrendingUp className="w-5 h-5" />
+                  <span>Sort</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-[#424242] border-[#383838]">
-                <DropdownMenuItem 
-                  onClick={() => setSortBy('name')}
-                  className="text-white hover:bg-[#383838]"
-                >
-                  Name
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setSortBy('updated')}
-                  className="text-white hover:bg-[#383838]"
-                >
-                  Last Updated
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setSortBy('created')}
-                  className="text-white hover:bg-[#383838]"
-                >
-                  Created Date
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setSortBy('stars')}
-                  className="text-white hover:bg-[#383838]"
-                >
-                  Stars
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setSortBy('forks')}
-                  className="text-white hover:bg-[#383838]"
-                >
-                  Forks
-                </DropdownMenuItem>
+              <DropdownMenuContent className="bg-[#232323] border-[#353535] rounded-xl">
+                <DropdownMenuItem onClick={() => setSortBy('name')} className="text-white hover:bg-[#353535] py-3 text-base">Name</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy('updated')} className="text-white hover:bg-[#353535] py-3 text-base">Last Updated</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy('created')} className="text-white hover:bg-[#353535] py-3 text-base">Created Date</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy('stars')} className="text-white hover:bg-[#353535] py-3 text-base">Stars</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy('forks')} className="text-white hover:bg-[#353535] py-3 text-base">Forks</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            
-            <Button
-              variant="outline"
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="bg-[#424242] border-[#383838] text-white hover:bg-[#383838]"
-            >
-              {sortOrder === 'asc' ? '↑' : '↓'}
-            </Button>
-            
-            <div className="flex border border-[#383838] rounded-lg overflow-hidden">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                onClick={() => setViewMode('grid')}
-                className={`px-3 py-2 ${viewMode === 'grid' ? 'bg-green-400 text-[#282828]' : 'bg-[#424242] text-white hover:bg-[#383838]'}`}
-              >
-                <FiGrid className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'ghost'}
-                onClick={() => setViewMode('list')}
-                className={`px-3 py-2 ${viewMode === 'list' ? 'bg-green-400 text-[#282828]' : 'bg-[#424242] text-white hover:bg-[#383838]'}`}
-              >
-                <FiList className="w-4 h-4" />
-              </Button>
+            <Button variant="outline" onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')} className="bg-[#232323] border-[#353535] text-white hover:bg-[#353535] rounded-xl px-4 py-3 min-h-[44px] text-base">{sortOrder === 'asc' ? '↑' : '↓'}</Button>
+            <div className="flex border border-[#353535] rounded-xl overflow-hidden">
+              <Button variant={viewMode === 'grid' ? 'default' : 'ghost'} onClick={() => setViewMode('grid')} className={`px-4 py-3 min-h-[44px] text-base ${viewMode === 'grid' ? 'bg-green-400 text-[#282828]' : 'bg-[#232323] text-white hover:bg-[#353535]'} rounded-none flex items-center`}><FiGrid className="w-5 h-5" /></Button>
+              <Button variant={viewMode === 'list' ? 'default' : 'ghost'} onClick={() => setViewMode('list')} className={`px-4 py-3 min-h-[44px] text-base ${viewMode === 'list' ? 'bg-green-400 text-[#282828]' : 'bg-[#232323] text-white hover:bg-[#353535]'} rounded-none flex items-center`}><FiList className="w-5 h-5" /></Button>
             </div>
           </div>
         </div>
+        <div className="border-b border-[#353535] mb-0" />
 
         {/* Projects Grid/List */}
-        {viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredAndSortedProjects.map((project) => {
-              const data = getRepoData(project.githubUrl as string);
-              const isLoading = project.githubUrl ? loading[project.githubUrl] : false;
-              
-              return (
-                <Card 
-                  key={project.id}
-                  className="relative overflow-hidden bg-gradient-to-br from-[#424242] to-[#383838] border-[#383838] hover:border-green-500 cursor-pointer"
-                  onClick={() => handleProjectChange(project.id)}
-                >
-                  {/* Status Indicators */}
-                  <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
-                    {data?.private && (
-                      <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                    )}
-                    {data?.archived && (
-                      <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                    )}
-                    {data?.fork && (
-                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                    )}
-                  </div>
-
-                  <CardHeader className="pb-3 relative z-10">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
-                            <FiFolder className="w-4 h-4 text-white" />
-                          </div>
-                          <CardTitle className="text-lg font-bold text-white truncate">
-                            {project.name}
-                          </CardTitle>
-                        </div>
-                        
-                        {/* Repository Info */}
-                        {data && (
-                          <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
-                            <span className="flex items-center gap-1">
-                              <FiUsers className="w-3 h-3" />
-                              {data.private ? 'Private' : 'Public'}
-                            </span>
-                            {data.fork && (
-                              <span className="flex items-center gap-1">
-                                <FiGitBranch className="w-3 h-3" />
-                                Fork
-                              </span>
-                            )}
-                            {data.archived && (
-                              <span className="flex items-center gap-1">
-                                <FiActivity className="w-3 h-3" />
-                                Archived
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      
-                      {data?.html_url && (
-                        <Link 
-                          href={data.html_url} 
-                          target="_blank" 
-                          onClick={e => e.stopPropagation()}
-                          className="text-gray-400 hover:text-green-400 p-2 hover:bg-green-500/10 rounded-lg"
-                        >
-                          <FiGithub className="w-5 h-5" />
-                        </Link>
+        <div className="py-8">
+          {viewMode === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {filteredAndSortedProjects.map((project) => {
+                const data = getRepoData(project.githubUrl as string);
+                const isLoading = project.githubUrl ? loading[project.githubUrl] : false;
+                
+                return (
+                  <Card 
+                    key={project.id}
+                    className="relative overflow-hidden bg-gradient-to-br from-[#424242] to-[#383838] border-[#383838] hover:border-green-500 cursor-pointer"
+                    onClick={() => handleProjectChange(project.id)}
+                  >
+                    {/* Status Indicators */}
+                    <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+                      {data?.private && (
+                        <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                      )}
+                      {data?.archived && (
+                        <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+                      )}
+                      {data?.fork && (
+                        <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                       )}
                     </div>
-                  </CardHeader>
-                  
-                  <CardContent className="pt-0 relative z-10">
-                    {isLoading ? (
-                      <div className="animate-pulse space-y-4">
-                        <div className="h-4 bg-[#383838] rounded"></div>
-                        <div className="h-4 bg-[#383838] rounded w-3/4"></div>
-                        <div className="flex gap-2">
-                          <div className="h-6 bg-[#383838] rounded w-16"></div>
-                          <div className="h-6 bg-[#383838] rounded w-20"></div>
-                        </div>
-                        <div className="flex justify-between">
-                          <div className="h-4 bg-[#383838] rounded w-12"></div>
-                          <div className="h-4 bg-[#383838] rounded w-16"></div>
-                          <div className="h-4 bg-[#383838] rounded w-12"></div>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        {data?.description && (
-                          <p className="text-gray-300 text-sm mb-4 line-clamp-2 leading-relaxed">
-                            {data.description}
-                          </p>
-                        )}
-                        
-                        {data?.language && (
-                          <div className="flex items-center gap-2 mb-4">
-                            <div className="flex items-center gap-2 px-3 py-1 bg-[#383838] rounded-full">
-                              <span className={`w-3 h-3 rounded-full ${getLanguageColor(data.language)} shadow-lg`}></span>
-                              <span className="text-sm text-gray-300 font-medium">{data.language}</span>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {data && (
-                          <div className="space-y-4">
-                            {/* Stats with Icons */}
-                            <div className="grid grid-cols-3 gap-3">
-                              <div className="text-center p-2 bg-[#383838] rounded-lg">
-                                <div className="flex items-center justify-center gap-1 mb-1">
-                                  <FiStar className="w-4 h-4 text-yellow-400" />
-                                  <span className="text-sm font-semibold text-white">
-                                    {data.stargazers_count.toLocaleString()}
-                                  </span>
-                                </div>
-                                <span className="text-xs text-gray-400">Stars</span>
-                              </div>
-                              
-                              <div className="text-center p-2 bg-[#383838] rounded-lg">
-                                <div className="flex items-center justify-center gap-1 mb-1">
-                                  <FiGitBranch className="w-4 h-4 text-blue-400" />
-                                  <span className="text-sm font-semibold text-white">
-                                    {data.forks_count.toLocaleString()}
-                                  </span>
-                                </div>
-                                <span className="text-xs text-gray-400">Forks</span>
-                              </div>
-                              
-                              <div className="text-center p-2 bg-[#383838] rounded-lg">
-                                <div className="flex items-center justify-center gap-1 mb-1">
-                                  <FiEye className="w-4 h-4 text-green-400" />
-                                  <span className="text-sm font-semibold text-white">
-                                    {data.watchers_count.toLocaleString()}
-                                  </span>
-                                </div>
-                                <span className="text-xs text-gray-400">Watching</span>
-                              </div>
-                            </div>
-                            
-                            {/* Additional Info */}
-                            <div className="space-y-2">
-                              {data.open_issues_count > 0 && (
-                                <div className="flex items-center justify-between text-xs text-gray-400">
-                                  <span className="flex items-center gap-1">
-                                    <FiActivity className="w-3 h-3" />
-                                    Open Issues
-                                  </span>
-                                  <span className="font-medium">{data.open_issues_count}</span>
-                                </div>
-                              )}
-                              
-                              {data.size > 0 && (
-                                <div className="flex items-center justify-between text-xs text-gray-400">
-                                  <span className="flex items-center gap-1">
-                                    <FiCode className="w-3 h-3" />
-                                    Size
-                                  </span>
-                                  <span className="font-medium">
-                                    {data.size > 1024 ? `${(data.size / 1024).toFixed(1)} MB` : `${data.size} KB`}
-                                  </span>
-                                </div>
-                              )}
-                              
-                              {data.updated_at && (
-                                <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-[#383838]">
-                                  <span className="flex items-center gap-1">
-                                    <FiClock className="w-3 h-3" />
-                                    Last Updated
-                                  </span>
-                                  <span className="font-medium">{formatDate(data.updated_at)}</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                        
-                        {!data && (
-                          <div className="text-center py-8">
-                            <div className="w-16 h-16 bg-[#383838] rounded-full flex items-center justify-center mx-auto mb-4">
-                              <FiCode className="w-8 h-8 text-gray-500" />
-                            </div>
-                            <p className="text-sm text-gray-500 mb-2">No GitHub data available</p>
-                            <p className="text-xs text-gray-600">This project may not be connected to GitHub</p>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })}
-            
-            {/* New Project Card */}
-            <Card 
-              className="relative overflow-hidden bg-gradient-to-br from-[#424242] to-[#383838] border-2 border-dashed border-[#383838] hover:border-green-500 cursor-pointer"
-              onClick={() => router.push('/new-project')}
-            >
-              <CardContent className="flex flex-col items-center justify-center py-16 text-center relative z-10">
-                <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mb-6">
-                  <FiPlus className="w-10 h-10 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">
-                  Create New Project
-                </h3>
-                <p className="text-sm text-gray-400 leading-relaxed max-w-xs">
-                  Import a GitHub repository to start analyzing your codebase with AI-powered insights
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {filteredAndSortedProjects.map((project) => {
-              const data = getRepoData(project.githubUrl as string);
-              const isLoading = project.githubUrl ? loading[project.githubUrl] : false;
-              
-              return (
-                <Card 
-                  key={project.id}
-                  className="relative overflow-hidden bg-gradient-to-r from-[#424242] to-[#383838] border-[#383838] hover:border-green-500 cursor-pointer"
-                  onClick={() => handleProjectChange(project.id)}
-                >
-                  <CardContent className="p-6 relative z-10">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-6 flex-1">
-                        <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center">
-                          <FiFolder className="w-8 h-8 text-white" />
-                        </div>
-                        
+
+                    <CardHeader className="pb-3 relative z-10">
+                      <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-3">
-                            <h3 className="text-xl font-bold text-white truncate">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
+                              <FiFolder className="w-4 h-4 text-white" />
+                            </div>
+                            <CardTitle className="text-lg font-bold text-white truncate">
                               {project.name}
-                            </h3>
-                            <div className="flex items-center gap-2">
-                              {data?.private && (
-                                <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 text-xs border-purple-500/30">
-                                  Private
-                                </Badge>
-                              )}
-                              {data?.archived && (
-                                <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 text-xs border-orange-500/30">
-                                  Archived
-                                </Badge>
-                              )}
-                              {data?.fork && (
-                                <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 text-xs border-blue-500/30">
+                            </CardTitle>
+                          </div>
+                          
+                          {/* Repository Info */}
+                          {data && (
+                            <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
+                              <span className="flex items-center gap-1">
+                                <FiUsers className="w-3 h-3" />
+                                {data.private ? 'Private' : 'Public'}
+                              </span>
+                              {data.fork && (
+                                <span className="flex items-center gap-1">
+                                  <FiGitBranch className="w-3 h-3" />
                                   Fork
-                                </Badge>
+                                </span>
+                              )}
+                              {data.archived && (
+                                <span className="flex items-center gap-1">
+                                  <FiActivity className="w-3 h-3" />
+                                  Archived
+                                </span>
                               )}
                             </div>
-                          </div>
-                          
-                          {data?.description && (
-                            <p className="text-gray-300 text-sm mb-4 line-clamp-2 leading-relaxed">
-                              {data.description}
-                            </p>
                           )}
-                          
-                          <div className="flex items-center gap-6 text-sm text-gray-400">
-                            {data?.language && (
-                              <div className="flex items-center gap-2 px-3 py-1 bg-[#383838] rounded-full">
-                                <span className={`w-3 h-3 rounded-full ${getLanguageColor(data.language)} shadow-lg`}></span>
-                                <span className="font-medium">{data.language}</span>
-                              </div>
-                            )}
-                            
-                            {data && (
-                              <>
-                                <div className="flex items-center gap-1">
-                                  <FiStar className="w-4 h-4 text-yellow-400" />
-                                  <span className="font-semibold">{data.stargazers_count.toLocaleString()}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <FiGitBranch className="w-4 h-4 text-blue-400" />
-                                  <span className="font-semibold">{data.forks_count.toLocaleString()}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <FiEye className="w-4 h-4 text-green-400" />
-                                  <span className="font-semibold">{data.watchers_count.toLocaleString()}</span>
-                                </div>
-                                {data.open_issues_count > 0 && (
-                                  <div className="flex items-center gap-1">
-                                    <FiActivity className="w-4 h-4 text-red-400" />
-                                    <span className="font-semibold">{data.open_issues_count}</span>
-                                  </div>
-                                )}
-                              </>
-                            )}
-                            
-                            {data?.updated_at && (
-                              <div className="flex items-center gap-1">
-                                <FiClock className="w-4 h-4" />
-                                <span>Updated {formatDate(data.updated_at)}</span>
-                              </div>
-                            )}
-                          </div>
                         </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
+                        
                         {data?.html_url && (
                           <Link 
                             href={data.html_url} 
@@ -761,44 +448,287 @@ const DashboardPage = () => {
                             <FiGithub className="w-5 h-5" />
                           </Link>
                         )}
-                        <div className="p-2 hover:bg-[#383838] rounded-lg">
-                          <FiMoreVertical className="w-5 h-5 text-gray-400" />
+                      </div>
+                    </CardHeader>
+                    
+                    <CardContent className="pt-0 relative z-10">
+                      {isLoading ? (
+                        <div className="animate-pulse space-y-4">
+                          <div className="h-4 bg-[#383838] rounded"></div>
+                          <div className="h-4 bg-[#383838] rounded w-3/4"></div>
+                          <div className="flex gap-2">
+                            <div className="h-6 bg-[#383838] rounded w-16"></div>
+                            <div className="h-6 bg-[#383838] rounded w-20"></div>
+                          </div>
+                          <div className="flex justify-between">
+                            <div className="h-4 bg-[#383838] rounded w-12"></div>
+                            <div className="h-4 bg-[#383838] rounded w-16"></div>
+                            <div className="h-4 bg-[#383838] rounded w-12"></div>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          {data?.description && (
+                            <p className="text-gray-300 text-sm mb-4 line-clamp-2 leading-relaxed">
+                              {data.description}
+                            </p>
+                          )}
+                          
+                          {data?.language && (
+                            <div className="flex items-center gap-2 mb-4">
+                              <div className="flex items-center gap-2 px-3 py-1 bg-[#383838] rounded-full">
+                                <span className={`w-3 h-3 rounded-full ${getLanguageColor(data.language)} shadow-lg`}></span>
+                                <span className="text-sm text-gray-300 font-medium">{data.language}</span>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {data && (
+                            <div className="space-y-4">
+                              {/* Stats with Icons */}
+                              <div className="grid grid-cols-3 gap-3">
+                                <div className="text-center p-2 bg-[#383838] rounded-lg">
+                                  <div className="flex items-center justify-center gap-1 mb-1">
+                                    <FiStar className="w-4 h-4 text-yellow-400" />
+                                    <span className="text-sm font-semibold text-white">
+                                      {data.stargazers_count.toLocaleString()}
+                                    </span>
+                                  </div>
+                                  <span className="text-xs text-gray-400">Stars</span>
+                                </div>
+                                
+                                <div className="text-center p-2 bg-[#383838] rounded-lg">
+                                  <div className="flex items-center justify-center gap-1 mb-1">
+                                    <FiGitBranch className="w-4 h-4 text-blue-400" />
+                                    <span className="text-sm font-semibold text-white">
+                                      {data.forks_count.toLocaleString()}
+                                    </span>
+                                  </div>
+                                  <span className="text-xs text-gray-400">Forks</span>
+                                </div>
+                                
+                                <div className="text-center p-2 bg-[#383838] rounded-lg">
+                                  <div className="flex items-center justify-center gap-1 mb-1">
+                                    <FiEye className="w-4 h-4 text-green-400" />
+                                    <span className="text-sm font-semibold text-white">
+                                      {data.watchers_count.toLocaleString()}
+                                    </span>
+                                  </div>
+                                  <span className="text-xs text-gray-400">Watching</span>
+                                </div>
+                              </div>
+                              
+                              {/* Additional Info */}
+                              <div className="space-y-2">
+                                {data.open_issues_count > 0 && (
+                                  <div className="flex items-center justify-between text-xs text-gray-400">
+                                    <span className="flex items-center gap-1">
+                                      <FiActivity className="w-3 h-3" />
+                                      Open Issues
+                                    </span>
+                                    <span className="font-medium">{data.open_issues_count}</span>
+                                  </div>
+                                )}
+                                
+                                {data.size > 0 && (
+                                  <div className="flex items-center justify-between text-xs text-gray-400">
+                                    <span className="flex items-center gap-1">
+                                      <FiCode className="w-3 h-3" />
+                                      Size
+                                    </span>
+                                    <span className="font-medium">
+                                      {data.size > 1024 ? `${(data.size / 1024).toFixed(1)} MB` : `${data.size} KB`}
+                                    </span>
+                                  </div>
+                                )}
+                                
+                                {data.updated_at && (
+                                  <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-[#383838]">
+                                    <span className="flex items-center gap-1">
+                                      <FiClock className="w-3 h-3" />
+                                      Last Updated
+                                    </span>
+                                    <span className="font-medium">{formatDate(data.updated_at)}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {!data && (
+                            <div className="text-center py-8">
+                              <div className="w-16 h-16 bg-[#383838] rounded-full flex items-center justify-center mx-auto mb-4">
+                                <FiCode className="w-8 h-8 text-gray-500" />
+                              </div>
+                              <p className="text-sm text-gray-500 mb-2">No GitHub data available</p>
+                              <p className="text-xs text-gray-600">This project may not be connected to GitHub</p>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+              
+              {/* New Project Card */}
+              <Card 
+                className="relative overflow-hidden bg-gradient-to-br from-[#424242] to-[#383838] border-2 border-dashed border-[#383838] hover:border-green-500 cursor-pointer"
+                onClick={() => router.push('/new-project')}
+              >
+                <CardContent className="flex flex-col items-center justify-center py-16 text-center relative z-10">
+                  <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mb-6">
+                    <FiPlus className="w-10 h-10 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-3">
+                    Create New Project
+                  </h3>
+                  <p className="text-sm text-gray-400 leading-relaxed max-w-xs">
+                    Import a GitHub repository to start analyzing your codebase with AI-powered insights
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {filteredAndSortedProjects.map((project) => {
+                const data = getRepoData(project.githubUrl as string);
+                const isLoading = project.githubUrl ? loading[project.githubUrl] : false;
+                
+                return (
+                  <Card 
+                    key={project.id}
+                    className="relative overflow-hidden bg-gradient-to-r from-[#424242] to-[#383838] border-[#383838] hover:border-green-500 cursor-pointer"
+                    onClick={() => handleProjectChange(project.id)}
+                  >
+                    <CardContent className="p-6 relative z-10">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-6 flex-1">
+                          <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center">
+                            <FiFolder className="w-8 h-8 text-white" />
+                          </div>
+                          
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3 mb-3">
+                              <h3 className="text-xl font-bold text-white truncate">
+                                {project.name}
+                              </h3>
+                              <div className="flex items-center gap-2">
+                                {data?.private && (
+                                  <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 text-xs border-purple-500/30">
+                                    Private
+                                  </Badge>
+                                )}
+                                {data?.archived && (
+                                  <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 text-xs border-orange-500/30">
+                                    Archived
+                                  </Badge>
+                                )}
+                                {data?.fork && (
+                                  <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 text-xs border-blue-500/30">
+                                    Fork
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                            
+                            {data?.description && (
+                              <p className="text-gray-300 text-sm mb-4 line-clamp-2 leading-relaxed">
+                                {data.description}
+                              </p>
+                            )}
+                            
+                            <div className="flex items-center gap-6 text-sm text-gray-400">
+                              {data?.language && (
+                                <div className="flex items-center gap-2 px-3 py-1 bg-[#383838] rounded-full">
+                                  <span className={`w-3 h-3 rounded-full ${getLanguageColor(data.language)} shadow-lg`}></span>
+                                  <span className="font-medium">{data.language}</span>
+                                </div>
+                              )}
+                              
+                              {data && (
+                                <>
+                                  <div className="flex items-center gap-1">
+                                    <FiStar className="w-4 h-4 text-yellow-400" />
+                                    <span className="font-semibold">{data.stargazers_count.toLocaleString()}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <FiGitBranch className="w-4 h-4 text-blue-400" />
+                                    <span className="font-semibold">{data.forks_count.toLocaleString()}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <FiEye className="w-4 h-4 text-green-400" />
+                                    <span className="font-semibold">{data.watchers_count.toLocaleString()}</span>
+                                  </div>
+                                  {data.open_issues_count > 0 && (
+                                    <div className="flex items-center gap-1">
+                                      <FiActivity className="w-4 h-4 text-red-400" />
+                                      <span className="font-semibold">{data.open_issues_count}</span>
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                              
+                              {data?.updated_at && (
+                                <div className="flex items-center gap-1">
+                                  <FiClock className="w-4 h-4" />
+                                  <span>Updated {formatDate(data.updated_at)}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-3">
+                          {data?.html_url && (
+                            <Link 
+                              href={data.html_url} 
+                              target="_blank" 
+                              onClick={e => e.stopPropagation()}
+                              className="text-gray-400 hover:text-green-400 p-2 hover:bg-green-500/10 rounded-lg"
+                            >
+                              <FiGithub className="w-5 h-5" />
+                            </Link>
+                          )}
+                          <div className="p-2 hover:bg-[#383838] rounded-lg">
+                            <FiMoreVertical className="w-5 h-5 text-gray-400" />
+                          </div>
                         </div>
                       </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+              
+              {/* New Project Card - List View */}
+              <Card 
+                className="relative overflow-hidden bg-gradient-to-r from-[#424242] to-[#383838] border-2 border-dashed border-[#383838] hover:border-green-500 cursor-pointer"
+                onClick={() => router.push('/new-project')}
+              >
+                <CardContent className="p-6 relative z-10">
+                  <div className="flex items-center gap-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center">
+                      <FiPlus className="w-8 h-8 text-white" />
                     </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-            
-            {/* New Project Card - List View */}
-            <Card 
-              className="relative overflow-hidden bg-gradient-to-r from-[#424242] to-[#383838] border-2 border-dashed border-[#383838] hover:border-green-500 cursor-pointer"
-              onClick={() => router.push('/new-project')}
-            >
-              <CardContent className="p-6 relative z-10">
-                <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center">
-                    <FiPlus className="w-8 h-8 text-white" />
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-white mb-2">
+                        Create New Project
+                      </h3>
+                      <p className="text-sm text-gray-400">
+                        Import a GitHub repository to start analyzing your codebase with AI-powered insights
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-white mb-2">
-                      Create New Project
-                    </h3>
-                    <p className="text-sm text-gray-400">
-                      Import a GitHub repository to start analyzing your codebase with AI-powered insights
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
 
         {/* Empty State */}
         {(!projects || projects.length === 0) && !isLoading && (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-[#424242] rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="text-center py-16 mt-8">
+            <div className="w-24 h-24 bg-[#232323] rounded-full flex items-center justify-center mx-auto mb-6">
               <FiFolder className="w-12 h-12 text-gray-500" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-3">No projects yet</h3>
@@ -817,8 +747,8 @@ const DashboardPage = () => {
 
         {/* No Results State */}
         {projects && projects.length > 0 && filteredAndSortedProjects.length === 0 && (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-[#424242] rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="text-center py-16 mt-8">
+            <div className="w-24 h-24 bg-[#232323] rounded-full flex items-center justify-center mx-auto mb-6">
               <FiSearch className="w-12 h-12 text-gray-500" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-3">No projects found</h3>

@@ -14,4 +14,6 @@ export * from './time';
 export * from './cache';
 export * from './validation';
 export * from './features';
+export * from './faq';
+export * from './pricing';
 export * from './env'; 
