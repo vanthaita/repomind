@@ -8,7 +8,7 @@ type Props = {
 
 const DashboardLayout = ({ children }: Props) => {
   return (
-    <main className='bg-[#282828]' suppressHydrationWarning>
+    <main className='bg-[#282828] scroll-custom' suppressHydrationWarning >
     <Suspense fallback={<PageLoading />}>
       {children}
     </Suspense>  

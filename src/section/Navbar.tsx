@@ -69,7 +69,7 @@ const Navbar = () => {
                 <div className="grid grid-cols-2 lg:grid-cols-3 items-center">
                     <div className="flex justify-start lg:justify-center">
                         <Link href="/" className="cursor-pointer">
-                            <Logo size="sm" animated={false} />
+                            <Logo size="lg" animated={false} />
                         </Link>
                     </div>
                     <div className="lg:flex justify-center items-center hidden">

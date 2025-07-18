@@ -49,24 +49,25 @@ const BackToTopButton = () => {
 };
 
 
-import Faq from "@/section/Faq";
-import FeatureList from "@/section/Features";
-import Footer from "@/section/Footer";
-import Hero from "@/section/Hero";
-import Navbar from "@/section/Navbar";
-import PricingPage from "@/section/Pricing";
+import Hero from '@/section/Hero';
+import Features from '@/section/Features';
+import Pricing from '@/section/Pricing';
+import Testimonial from '@/section/Testimonial';
+import Faq from '@/section/Faq';
+import Footer from '@/section/Footer';
+import Navbar from '@/section/Navbar';
 
-
-export default function Home() { 
+export default function HomePage() {
   return (
     <>
-      <Navbar />
+      <Navbar/>
       <Hero />
-      <FeatureList />
-      <PricingPage />
+      <Features />
+      <Pricing />
+      <Testimonial />
       <Faq />
-      <Footer />
       <BackToTopButton />
+      <Footer/>
     </>
-  )
+  );
 }
